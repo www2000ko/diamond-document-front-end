@@ -16,13 +16,13 @@
       active-text-color="#ffd04b"
     >
     <!-- background-color="#545c64" -->
-      <el-menu-item index="myinfo" @click="changeinfoflag()" >
+      <el-menu-item class="nav-title" index="myinfo" @click="changeinfoflag()" >
         个人信息
       </el-menu-item>
-      <el-menu-item index="mycode" @click="changecodeflag()" >
+      <el-menu-item class="nav-title" index="mycode" @click="changecodeflag()" >
         账号密码
       </el-menu-item>
-      <el-menu-item  index="myteam" @click="changeteamflag()" >
+      <el-menu-item class="nav-title"  index="myteam" @click="changeteamflag()" >
         团队管理
       </el-menu-item>
     </el-menu>
@@ -48,7 +48,6 @@
       用户名{{uname}}
       <br/>
       邮箱{{email}} 
-
 
       <div class="radio">
           性别
@@ -390,5 +389,15 @@ export default {
     box-shadow: rgba(0,0,0,.0470588) 0 2px 3px 0;
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
+  }
+  .nav-title{
+    -webkit-tap-highlight-color: transparent;
+    line-height: 20px;
+    list-style: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: grey;
+    box-sizing: border-box;
+    padding:10px 15px 10px 5px;
   }
 </style>
