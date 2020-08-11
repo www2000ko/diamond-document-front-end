@@ -9,6 +9,9 @@
       <el-menu-item index="home" @click="toHome" >
         首页
       </el-menu-item>
+      <el-menu-item style="float:right" index="break" @click="toBreak">
+        茶歇GameBreak
+      </el-menu-item>
       <el-menu-item style="float:right" index="info" @click="toInfo" v-if="loginflag==true">
         个人信息
       </el-menu-item>
@@ -43,6 +46,9 @@ export default {
   methods: {
     toHome() {
       this.$router.push({ path: "/home" });
+    },
+    toBreak() {
+      this.$router.push({ path: "/break" });
     },
     toSignup() {
       this.$router.push({ path: "/signup" });
