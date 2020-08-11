@@ -148,7 +148,7 @@ export default {
         .post("http://127.0.0.1:8080/verification", {
           type:"1",
           email: that.regist_form.email,
-          code:that.code
+          code:String(that.code)
         })
         .then(function(response) {
           if (response.data.msg == "send email success")
