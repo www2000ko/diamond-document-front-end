@@ -277,11 +277,12 @@ export default {
         let param=new FormData;
         param.append('file',fileobj.file);
         var that= this;
+        alert("here");
         axios
-        .post("http://127.0.0.1:5000/uploadavatar", param)
+        .post("http://127.0.0.1:8080/upload", param)
         .then(function(res) {
-          that.image_url=res.data.image_url;
-          console.log(res.data.image_url);
+          that.image_url=res.data.url;
+          console.log(res.data.url);
         })
         .catch(function(error) {
           alert(error);
