@@ -72,7 +72,7 @@ export default {
         }
       };
       var checkcode = (rule, value, callback) => {
-        if (value !== this.code) {
+        if (Number(value) !== Number(this.code)) {
           callback(new Error('验证码错误'));
         } else {
           callback();
@@ -121,16 +121,21 @@ export default {
              console.log('yes submit!!')
              var that = this;
       axios
-        .post("http://127.0.0.1:5000/regist", that.regist_form)
+        .post("http://127.0.0.1:8080/signup", {
+          uname:that.regist_form.uname,
+          passwd1:that.regist_form.passwd1,
+          email:that.regist_form.email
+        })
         .then(function(response) {
           alert(response.data.msg);
-          if (response.data.msg == "注册成功!")
+          if (response.data.msg == "insert success")
             that.$router.push({ path: "/login" });
         })
         .catch(function(error) {
           console.log(error);
         });
         } else {
+          alert("no!")
           return false
         }
     })
@@ -140,12 +145,13 @@ export default {
       var that=this;
       that.code=Math.floor(Math.random() * (999999 - 100000) + 100000);
       axios
-        .post("http://127.0.0.1:5000/verification", {
+        .post("http://127.0.0.1:8080/verification", {
+          type:"1",
           email: that.regist_form.email,
           code:that.code
         })
         .then(function(response) {
-          if (response.data.msg == "发送成功，请注意查收~")
+          if (response.data.msg == "send email success")
             that.send_status=true;
             that.send_message="已发送";
         })

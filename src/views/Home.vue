@@ -95,6 +95,8 @@
 <script>
 // @ is an alias to /src
 import Navigator from "@/components/Navigator.vue";
+import global from "@/components/global.vue";
+import axios from "axios";
 
 export default {
   name: "Home",
@@ -103,6 +105,7 @@ export default {
   },
   data() {
     return {
+      userid:0,
       searchkind:1,
       pageflag:1,
       allfiles:{},
@@ -112,13 +115,30 @@ export default {
   },
   created()
   {
-
+    this.userid=global.userid
+    this.search()
   },
   methods: {
    changesearchkind(aint)
    {
-    this.searchkind=aint
-   }
+    this.searchkind=aint,
+    this.search()
+   },
+   search() {
+      var that = this;
+        axios
+          .post("http://127.0.0.1:8080/home", {
+            id: that.userid,
+            kind: that.searchkind
+          })
+          .then(function(response) {
+            alert("搜索完成（测试）");
+            alert(response.data.msg);
+          })
+          .catch(function(error) {
+            alert(error);
+          });
+  },
   }
 };
 </script>
@@ -137,54 +157,64 @@ export default {
 .el-icon-arrow-down {
   font-size: 12px;
 }
-.box { 
-  border: 1px solid #DCDFE6;
-  margin: 10px auto;
-  padding: 10px 35px 15px 35px;
-  border-radius: 5px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  box-shadow: 0 0 5px #909399;
-  opacity: 1
-}
-.art-more {
-	height: 40px;
-	display: flex;
-	justify-content: flex-end;
-	align-items: flex-end;
-}
-.art-more .view {
-	color: #aaa;
-}
-h5{
-	font-size: 18px;
-}
-.pagination {
-	background-color: #F9F9F9;
-}
-.name{
-  margin-top:10px ;
-  margin-left: 5px;
-}
-.art-time {
-	margin-right: 20px;
-}
-.art-title {
-	border-left: 3px solid #409EFF;
-	padding-left: 5px;
-	cursor: pointer;
-}
-.art-title:hover {
-	padding-left: 10px;
-	color: #409EFF;
-}
-.name{
-  margin-top:10px ;
-  margin-left: 5px;
-  cursor: pointer;
-}
-.name:hover{
-  padding-left: 10px;
-	color: #409EFF;
-}
+.searchBox{
+  
+  }
+  .searchInput{
+    
+  }
+  .searchButton{
+    
+  }
+  .box { 
+    border: 1px solid #DCDFE6;
+    margin: 10px auto;
+    padding: 10px 35px 15px 35px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    box-shadow: 0 0 5px #909399;
+    opacity: 1
+  }
+  .art-more {
+		height: 40px;
+		display: flex;
+		justify-content: flex-end;
+		align-items: flex-end;
+	}
+  .art-more .view {
+		color: #aaa;
+	}
+	h5{
+		font-size: 18px;
+	}
+	.pagination {
+		background-color: #F9F9F9;
+  }
+  .name{
+    margin-top:10px ;
+    margin-left: 5px;
+  }
+  .art-time {
+		margin-right: 20px;
+  }
+  .art-title {
+		border-left: 3px solid #409EFF;
+		padding-left: 5px;
+		cursor: pointer;
+	}
+	
+	.art-title:hover {
+		padding-left: 10px;
+		color: #409EFF;
+	}
+  .name{
+    margin-top:10px ;
+    margin-left: 5px;
+    cursor: pointer;
+  }
+  .name:hover{
+    padding-left: 10px;
+		color: #409EFF;
+  }
 </style>

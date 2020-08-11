@@ -3,10 +3,10 @@
     <Navigator return="login" />
       <el-form ref="login_form" :model="login_form" :rules="rules" label-width="80px" class="login-box">
       <h3 class="login-title">要登录了</h3>
-      <el-form-item label="账号" prop="username">  
+      <el-form-item label="账号" prop="email">  
       <el-input
-        placeholder="username"
-        v-model="login_form.username"
+        placeholder="email"
+        v-model="login_form.email"
         class="input-with-select"
       ></el-input>
       </el-form-item>
@@ -32,7 +32,6 @@
 import axios from "axios";
 import Navigator from "@/components/Navigator.vue";
 import global from "@/components/global.vue";
-import jwt_decode from 'jwt-decode';
 export default {
   name: "Login",
   components: {
@@ -41,14 +40,14 @@ export default {
   data() {
     return {
       login_form:{
-        username: "",
+        email: "",
         password: ""
       },
       showrepassword: false,
       rules:{
-        username:[
-          { required: true, message: '请输入用户名', trigger: 'blur' },
-          { min: 3, max: 12, message: '长度在 3 到 12 个字符', trigger: 'blur' }
+        email:[
+          { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+          { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
@@ -71,18 +70,14 @@ export default {
       if (valid) {
       var that = this;
       axios
-        .post("http://127.0.0.1:5000/signin", that.login_form)
+        .post("http://127.0.0.1:8080/login", that.login_form)
         .then(function(response) {
           alert(response.data.msg);
-          if (response.data.msg == "登录成功!") {
-            //alert(Navigator.username );
-            const decoded = jwt_decode(response.data.token);
-            console.log(decoded);
+          if (response.data.msg == "login success") {
             global.loginflag = true;
-            global.username = decoded.name;
-            global.userid = decoded.id;
-            global.avatar=decoded.avater;
-            that.$store.commit('setToken',JSON.stringify(response.data.token));
+            global.username = response.data.name;
+            global.userid = response.data.id;
+            global.avatar = response.data.avater;
             //alert(Navigator.username );
             //this.forceUpdate();
             //this.$root.username = that.uname;
@@ -91,7 +86,7 @@ export default {
               path: "/home"
             });
           }
-          else if(response.data.msg == "用户名或密码错误!")
+          else if(response.data.msg == "login fail")
           {
             that.showrepassword=true;
           }
