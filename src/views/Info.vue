@@ -37,7 +37,7 @@
       <div class="img-box"> 
       <el-upload
         class="avatar-uploader"
-        action="http://127.0.0.1:8080/uploadavatar"
+        action="http://127.0.0.1:8080/upload"
         :http-request="customUpload"
         :show-file-list="false"
         :before-upload="beforeAvatarUpload">
@@ -61,7 +61,7 @@
           v-model="birth"
           type="date"
           placeholder="选择日期"
-          value-format="yyyy-MM-dd">
+          >
         </el-date-picker>
 
         <br/>
@@ -133,21 +133,13 @@
 import axios from "axios";
 import Navigator from "@/components/Navigator.vue";
 import global from "@/components/global.vue";
-import jwt_decode from 'jwt-decode';
 export default {
   name: "Info",
   components: {
     Navigator
   },
   created() {
-    if(this.$store.getters.getToken){
-      const decoded = jwt_decode(this.$store.getters.getToken);
-      console.log(decoded);
-      global.loginflag=true;
-      global.username=decoded.name;
-      global.avatar=decoded.avatar;
-      global.userid=decoded.id;
-    }
+
   },
   data() {
     var checkpassword = (rule, value, callback) => {
@@ -216,7 +208,7 @@ export default {
           that.uname=response.data.name;
           that.email=response.data.email;
           that.sex=String(response.data.gender);
-          that.image_url=response.data.gender;
+          that.image_url=response.data.avatar;
           that.phonenumber=response.data.phone;
           that.birth=response.data.birthday;
           that.location=response.data.address;
@@ -225,6 +217,26 @@ export default {
           alert(error);
         });
     },
+    submitForm() {
+      var that = this;
+        axios
+          .post("http://127.0.0.1:8080/changepassword", {
+            email: that.email,
+            new_password: that.code_form.passwd1,
+          })
+          .then(function(response) {
+            if (response.data.msg == "change password success") {
+              alert("修改成功！");
+            }
+            else
+            {
+              alert("修改失败！");
+            }
+          })
+          .catch(function(error) {
+            alert(error);
+          });
+      },
     confirm() {
       var that = this;
         axios
@@ -277,11 +289,11 @@ export default {
         let param=new FormData;
         param.append('file',fileobj.file);
         var that= this;
-        alert("here");
         axios
-        .post("http://127.0.0.1:8080/upload", param)
+        .post("http://127.0.0.1:8080/upload",param)
         .then(function(res) {
           that.image_url=res.data.url;
+          global.avatar=res.data.url;
           console.log(res.data.url);
         })
         .catch(function(error) {
