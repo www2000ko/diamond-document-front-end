@@ -1,13 +1,16 @@
 <template>
   <div class="info">
     <Navigator return="info" />
+    <el-container class="contianer">
+    <el-aside class="card-aside">
     <!-- 第一框 -->
-    <div style="margin-top: 15px;" class="info-box" label-width="80px">
+    <div style="margin-top: 15px;" class="card-one"  label-width="80px">
       <el-avatar :src="this.image_url" :size="80"></el-avatar>
       <h3 class="info-title">{{uname}} </h3>
     </div>
+    
     <!-- 第2框 -->
-    <div style="margin-top: 15px;" class="info-box" label-width="80px">
+    <div style="margin-top: 15px;"  label-width="80px">
       <el-menu
       :default-active="deactive"
       active-text-color="#ffd04b"
@@ -24,9 +27,12 @@
       </el-menu-item>
     </el-menu>
     </div>
+    </el-aside>
     <!-- 第3框 -->
-    <div style="margin-top: 15px;" class="info-box" label-width="80px" v-if="infoflag==1">
-      个人信息
+    <el-main>
+    <div class="card" label-width="80px" v-if="infoflag==1">
+      <h4 class="card-header">个人信息</h4>
+      <div class="card-content">
       头像
       <div class="img-box"> 
       <el-upload
@@ -78,11 +84,13 @@
         @click="confirm()"
         >保存
       </el-button>
+      </div>
     </div>
 
 
     <!-- 第4框 -->
-    <div style="margin-top: 15px;" class="info-box" label-width="80px" v-if="codeflag==1">
+    <div class="card" label-width="80px" v-if="codeflag==1">
+      <h4 class="card-header">账号密码</h4>
       登录帐号
       {{email}}
 
@@ -111,10 +119,11 @@
     
 
     <!-- 第5框 -->
-    <div style="margin-top: 15px;" class="info-box" label-width="80px" v-if="teamflag==1">
-
+    <div class="card" label-width="80px" v-if="teamflag==1">
+      <h4 class="card-header">团队管理</h4>
     </div>
-
+    </el-main>
+    </el-container>
   </div>
 </template>
 
@@ -338,5 +347,48 @@ export default {
   .radio{
     display:block;
     margin: 0px auto;
+  }
+  
+  .card-header{padding:10px 15px 10px 5px;margin-left:10px;font-size:20px;line-height:30px;border-bottom:1px solid rgba(0,0,0,.12)}
+  .card-content{padding:10px 15px 10px 5px;margin-left:10px;
+    text-align:center;
+    padding: 35px 35px 15px 0px;}
+  .card-one{
+    padding:10px 15px 10px 5px;
+    font-size: 14px;
+    color: #383838;
+    line-height: 20px;
+    box-sizing: border-box;
+    border: 0;
+    box-shadow: rgba(0,0,0,.0470588) 0 2px 3px 0;
+    -webkit-border-radius: 2px;
+    background: #FFF;
+    margin-bottom: 20px;
+    transition: all .3s;
+    transition-delay: .1s;
+    opacity: 1;
+    transform: translate3d(0,0,0) scale(1);
+  }
+  .contianer{
+    -webkit-tap-highlight-color: transparent;
+    font-size: 14px;
+    color: #383838;
+    line-height: 20px;
+    box-sizing: border-box;
+    margin-right: auto;
+    margin-left: auto;
+    padding-left: 10px;
+    padding-right: 10px;
+    max-width: 980px;
+    width: 100%;
+  }
+  .card {
+    background-color: #fff;
+    border: 0;
+    border-radius: 2px;
+    -webkit-box-shadow: rgba(0,0,0,.0470588) 0 2px 3px 0;
+    box-shadow: rgba(0,0,0,.0470588) 0 2px 3px 0;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
   }
 </style>
