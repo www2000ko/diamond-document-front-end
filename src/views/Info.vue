@@ -37,7 +37,7 @@
       <div class="img-box"> 
       <el-upload
         class="avatar-uploader"
-        action="http://127.0.0.1:5000/uploadavatar"
+        action="http://127.0.0.1:8080/uploadavatar"
         :http-request="customUpload"
         :show-file-list="false"
         :before-upload="beforeAvatarUpload">
@@ -58,9 +58,10 @@
 
         生日
         <el-date-picker
-          v-model="value1"
+          v-model="birth"
           type="date"
-          placeholder="选择日期">
+          placeholder="选择日期"
+          value-format="yyyy-MM-dd">
         </el-date-picker>
 
         <br/>
@@ -178,7 +179,7 @@ export default {
       passwd2:"",
       location:'',
       phonenumber:'',
-      value1: '',
+      birth: '',
       deactive:"myinfo",
       infoflag:1,
       codeflag:0,
@@ -186,11 +187,12 @@ export default {
       sex:"1",
       uname: "临时用户",
       email: "临时邮箱",
-      image_url:'',
+      image_url:"临时路径",
     };
   },
   mounted(){
-    this.uname = global.username
+    this.email = global.userEmail
+    this.uname = global.userName
     this.getinfo();
   },
   methods: {
@@ -203,32 +205,21 @@ export default {
     changeteamflag() {
       (this.infoflag = 0), (this.codeflag = 0), (this.teamflag = 1);
     },
-    gethisblogs() {
-      var that = this;
-      axios
-        .post("http://127.0.0.1:5000/allhisblog", {
-          username: that.uname
-        })
-        .then(function(response) {
-          that.hisblogs=response
-        })
-        .catch(function(error) {
-          alert(error);
-        });
-    },
     getinfo(){
       var that = this;
       axios
-        .post("http://127.0.0.1:5000/getinfo", {
-          username: that.uname,
+        .post("http://127.0.0.1:8080/getinfo", {
+          email: that.email,
         })
         .then(function(response) {
           //that.$set()
+          that.uname=response.data.name;
           that.email=response.data.email;
-          that.info_form.age=response.data.old;
-          that.sex=String(response.data.sex);
-          that.fansnum=response.data.fansnum;
-          that.follownum=response.data.follownum;
+          that.sex=String(response.data.gender);
+          that.image_url=response.data.gender;
+          that.phonenumber=response.data.phone;
+          that.birth=response.data.birthday;
+          that.location=response.data.address;
         })
         .catch(function(error) {
           alert(error);
@@ -237,16 +228,18 @@ export default {
     confirm() {
       var that = this;
         axios
-          .post("http://127.0.0.1:5000/info", {
-            username: that.uname,
-            age: that.info_form.age,
-            sex: that.sex,
-            avatar:that.image_url
+          .post("http://127.0.0.1:8080/info", {
+            email: that.email,
+            name: that.uname,
+            avatar: String(that.image_url),
+            gender: Number(that.sex),
+            phone: that.phonenumber,
+            birthday: that.birth,
+            address: that.location
           })
           .then(function(res) {
             alert("修改成功！");
             that.$store.commit('setToken',JSON.stringify(res.data.token));
-            that.tomyinfo();
           })
           .catch(function(error) {
             alert(error);

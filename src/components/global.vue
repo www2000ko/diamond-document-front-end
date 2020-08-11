@@ -1,5 +1,6 @@
 <script>
   const userName = "临时用户";
+  const userEmail = "临时邮箱";
   const loginflag = false;
   const lookingblog = false;
   const userid = 0;
@@ -8,6 +9,7 @@
     userName,
     loginflag,
     lookingblog,
+    userEmail,
     userid,
     avatar,
   }

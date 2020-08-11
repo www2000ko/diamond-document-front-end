@@ -75,7 +75,8 @@ export default {
           alert(response.data.msg);
           if (response.data.msg == "login success") {
             global.loginflag = true;
-            global.username = response.data.name;
+            global.userName = response.data.name;
+            global.userEmail = response.data.email;
             global.userid = response.data.id;
             global.avatar = response.data.avater;
             //alert(Navigator.username );
