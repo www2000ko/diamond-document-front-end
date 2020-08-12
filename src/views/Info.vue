@@ -94,8 +94,6 @@
       登录帐号
       {{email}}
 
-      登录密码
-
       <el-form
         :model="code_form"
         :rules="rules"
