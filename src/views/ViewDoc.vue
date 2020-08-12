@@ -25,7 +25,7 @@
 		<i class="el-icon-star-on"></i>
 		<i class="el-icon-star-off"></i>
 		<i class="el-icon-share"></i>
-		<i class="el-icon-delete"></i>
+		<i class="el-icon-delete" @click="recycle()"></i>
 		<i class="el-icon-s-claim" @click="save()"></i>
 		</el-container>
 	</div>
@@ -34,11 +34,23 @@
 	      <mavon-editor class="editor" ref=md @imgAdd="$imgAdd" v-model="mdStr" @save="$save"></mavon-editor>
 	</div>
 
+	<div id="md2" v-if="writeflag==0">
+	<mavon-editor  
+	class="md"  
+	:value="mdStr"   
+	:subfield = "false"  
+	:defaultOpen = "'preview'"   
+	:toolbarsFlag = "false"  
+	:editable="false"   
+	:scrollStyle="true"  
+	:ishljs = "true"></mavon-editor>
+	</div>
 </div>
 </template>
 
 <script>
 import axios from "axios";
+import global from "@/components/global.vue";
 import Navigator from "@/components/Navigator.vue";
 export default {
 	name:'ViewDoc',
@@ -46,6 +58,7 @@ export default {
 	components:{Navigator},
 	data(){
 	  return {
+		docid:0,
 		teamid:0,
 		email:"临时邮箱",
 		writeflag:0,
@@ -58,14 +71,45 @@ export default {
 	},
 	created(){
 		this.writeflag = this.$route.params.kind;
+		this.docid = this.$route.params.docid;
 		this.email = global.userEmail;
+		this.getdoc();
 	},
 	methods:{
+		getdoc(){
+			var that = this;
+			axios
+			.post("http://175.24.53.216:8080/get_doc", {
+			id:Number(that.docid),
+			email: that.email,
+			})
+			.then(function(response) {
+			  that.title=response.data.title
+			  that.mdStr=response.data.content
+			})
+			.catch(function(error) {
+			alert(error);
+			});
+		},
 		changewrite(){
 			this.writeflag=1
 		},
 		tohome(){
 			this.$router.push({ path: "/home" });
+		},
+		recycle(){
+			var that = this;
+			axios
+			.post("http://175.24.53.216:8080/recycle", {
+			id:that.docid,
+			email: that.email,
+			})
+			.then(function(response) {
+			alert(response.data.msg);
+			})
+			.catch(function(error) {
+			alert(error);
+			});
 		},
         $imgAdd(pos, $file){
           var that=this;
@@ -73,7 +117,7 @@ export default {
            formdata.append('userid',that.userid);
            formdata.append('file', $file);
            axios
-          .post("http://127.0.0.1:8080/upload", formdata)
+          .post("http://175.24.53.216:8080/upload", formdata)
           .then(function(response) {
             that.$refs.md.$img2Url(pos,response.data.url);
           })
@@ -88,7 +132,8 @@ export default {
       }
         var that = this;
         axios
-        .post("http://127.0.0.1:8080/save_new_doc", {
+        .post("http://175.24.53.216:8080/modify_doc", {
+		  doc_id:that.docid,
           team_id: that.teamid,
           content: that.mdStr,
           title: that.title,
@@ -108,8 +153,9 @@ export default {
       }
         var that = this;
         axios
-        .post("http://127.0.0.1:8080/save_new_doc", {
-          team_id: Number(that.teamid),
+        .post("http://175.24.53.216:8080/modify_doc", {
+		  doc_id:that.docid,
+          team_id: that.teamid,
           content: that.mdStr,
           title: that.title,
           email: that.email,
