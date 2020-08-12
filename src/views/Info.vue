@@ -484,21 +484,4 @@ export default {
     box-sizing: border-box;
     padding:10px 15px 10px 5px;
   }
-  .el-row {
-    margin:0px,0px,30px,0px;
-  }
-  .el-col {
-    border-radius: 4px;
-  }
-  .bg-purple-light {
-    background: #d3dce6;
-  }
-  .grid-content {
-    border-radius: 4px;
-    min-height: 36px;
-  }
-  .Navbar{
-    margin:0px;
-    background-color:#d3dce6;
-  }
   </style>
