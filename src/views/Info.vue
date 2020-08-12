@@ -3,12 +3,10 @@
     <Navigator return="info" />
     <el-container class="contianer">
     <el-aside class="card-aside">
-    <!-- 第1框 -->
+    <!-- 第一框 -->
     <div style="margin-top: 15px;" class="card-one"  label-width="80px">
       <el-avatar :src="this.image_url" :size="80"></el-avatar>
-      <br/>
-      <br/>
-      <h3 class="info-title">{{uname}}</h3>
+      <h3 class="info-title">{{uname}} </h3>
     </div>
     
     <!-- 第2框 -->
@@ -35,9 +33,7 @@
     <div class="card" label-width="80px" v-if="infoflag==1">
       <h4 class="card-header">个人信息</h4>
       <div class="card-content">
-      <span class="choice">
-      头像：
-      </span>
+      头像
       <div class="img-box"> 
       <el-upload
         class="avatar-uploader"
@@ -49,46 +45,40 @@
       <i v-else class="el-icon-plus avatar-uploader-icon"></i>
       </el-upload>
       </div>
-      <span class="choice">用户名：</span>{{uname}}
+      用户名{{uname}}
       <br/>
-      <span class="choice">邮箱：</span>{{email}} 
-      <br/>
+      邮箱{{email}} 
+
       <div class="radio">
-      <p>
-          性别：
-          <el-radio v-model="sex" label="1">未知</el-radio>
-          <el-radio v-model="sex" label="0">男</el-radio>
-          <el-radio v-model="sex" label="2">女</el-radio>
-      </p>
+          性别
+          <el-radio v-model="sex" label="1">男</el-radio>
+          <el-radio v-model="sex" label="0">女</el-radio>
       </div>
-      <p>
-        生日：
+
+
+        生日
         <el-date-picker
           v-model="birth"
           type="date"
           placeholder="选择日期"
           >
         </el-date-picker>
-      </p>
-      <span class="choice">
-        联系方式：
-      </span>
+
+        <br/>
+        联系方式
         <el-input
         placeholder="phonenumber"
         v-model="phonenumber"
-        style="width:400px"
         ></el-input>
 
         <br/>
-      <span class="choice">
-        联系地址：
-      </span>
+        所在地
         <el-input
         placeholder="location"
         v-model="location"
-        style="width:400px"
         ></el-input>
-      <br/>
+
+
       <el-button
         type="primary"
         @click="confirm()"
@@ -97,30 +87,31 @@
       </div>
     </div>
 
+
     <!-- 第4框 -->
     <div class="card" label-width="80px" v-if="codeflag==1">
       <h4 class="card-header">账号密码</h4>
-    <div class="card-content">
-      <span class="choice">登录帐号：</span>
-      {{email}}<br/>
+      登录帐号
+      {{email}}
+
       <el-form
         :model="code_form"
         :rules="rules"
         ref="code_form"
       >
-      <span class="choice">重设密码：</span>
+      新密码
         <el-form-item prop="passwd1">
-          <el-input type="password" v-model="code_form.passwd1" style="width:400px"></el-input>
-        </el-form-item>
-      <span class="choice">确认密码：</span>
+          <el-input type="password" v-model="code_form.passwd1"></el-input>
+        </el-form-item> 
+      确认密码
         <el-form-item prop="passwd2">
-          <el-input type="password" v-model="code_form.passwd2" style="width:400px"></el-input>
+          <el-input type="password" v-model="code_form.passwd2"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm('code_form')">修改密码</el-button>
         </el-form-item>
       </el-form>
-    </div>
+
     </div>
 
     
@@ -313,13 +304,6 @@ export default {
 </script>
 
 <style scoped>
-
-p, .choice
-{
-    color:#33ccff;
-    font-weight:bold;
-}
-
 .avatar-uploader .el-upload {
   }
   .avatar-uploader .el-upload:hover {
@@ -350,8 +334,7 @@ p, .choice
   }
   .img-box {
     border: 1px solid #DCDFE6;
-    width: 180px;
-    height: 180px;
+    width: 178px;
     margin: 10px auto;
     padding: 0px 0px 0px 0px;
     border-radius: 5px;
@@ -372,11 +355,10 @@ p, .choice
   .card-header{padding:10px 15px 10px 5px;margin-left:10px;font-size:20px;line-height:30px;border-bottom:1px solid rgba(0,0,0,.12)}
   .card-content{padding:10px 15px 10px 5px;margin-left:10px;
     text-align:center;
-    padding: 20px 35px 15px 0px;}
+    padding: 35px 35px 15px 0px;}
   .card-one{
-    text-align:center;
-    padding:10px 10px 10px 10px;
-    font-size: 16px;
+    padding:10px 15px 10px 5px;
+    font-size: 14px;
     color: #383838;
     line-height: 20px;
     box-sizing: border-box;

@@ -48,7 +48,7 @@
           <el-menu-item index="1" @click="changesearchkind(1)">最近使用</el-menu-item>
           <el-menu-item index="2" @click="changesearchkind(2)">我创建的</el-menu-item>
           <el-menu-item index="3" @click="changesearchkind(3)">我的收藏</el-menu-item>
-          <el-menu-item index="4" style="float:right">新建文档</el-menu-item>
+          <el-menu-item index="4" style="float:right" @click="createdoc()">新建文档</el-menu-item>
           <el-menu-item index="5" style="float:right">按模版新建</el-menu-item>
         </el-menu>
         </el-row>
@@ -119,7 +119,16 @@ export default {
     this.search()
   },
   methods: {
-   changesearchkind(aint)
+  createdoc()
+  {
+      this.$router.push({
+        name: "Viewdoc",
+        params: {
+          kind: 1
+        }
+      });
+  },
+  changesearchkind(aint)
    {
     this.searchkind=aint,
     this.search()

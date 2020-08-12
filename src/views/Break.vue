@@ -102,76 +102,22 @@ export default {
             let c3=(Math.random()*3).toFixed(0);
             let c4=(Math.random()*3).toFixed(0);
             let random=Math.random().toFixed(1);
-            // let b=this.nospace();
+            // let b=this.isEnd();
             if(this["a"+c3+c4]) {
                 this.generate();
             } else {
                 this["a"+c3+c4]=this.arryList[random>0.6? 1:0];
             }
         },
-        nospace() {//判断是否存在空的格子
-            let b=true;
+        isEnd() {//判断是否存在空的格子
+            let b=false;
             for(let i=0;i<4;i++) {
                 for(let j=0;j<4;j++) {
                     if(this["a"+i+j]=="") {
-                        b=false;
-                    }
-                }
-            }
-            return b;
-        },
-        canMoveLeft() {//判断是否可以向左
-            let b=false;
-            for(let i=0;i<4;i++) {
-                for(let j=0;j<3;j++) {
-                    let k=j+1;
-                    if(this["a"+i+j]==""||this["a"+i+j]==this["a"+i+k]) {
                         b=true;
                     }
                 }
             }
-            return b;
-        },
-        canMoveRight() {//判断是否可以向右
-            let b=false;
-            for(let i=0;i<4;i++) {
-                for(let j=1;j<4;j++) {
-                    let k=j-1;
-                    if(this["a"+i+j]==""||this["a"+i+j]==this["a"+i+k]) {
-                        b=true;
-                    }
-                }
-            }
-            return b;
-        },
-        canMoveUp() {//判断是否可以向上
-            let b=false;
-            for(let i=0;i<3;i++) {
-                for(let j=0;j<4;j++) {
-                    let k=i+1;
-                    if(this["a"+i+j]==""||this["a"+i+j]==this["a"+k+j]) {
-                        b=true;
-                    }
-                }
-            }
-            return b;
-        },
-        canMoveDown() {//判断是否可以向下
-            let b=false;
-            for(let i=1;i<4;i++) {
-                for(let j=0;j<4;j++) {
-                    let k=i-1;
-                    if(this["a"+i+j]==""||this["a"+i+j]==this["a"+k+j]) {
-                        b=true;
-                    }
-                }
-            }
-            return b;
-        },
-        nomove(){//最后收尾
-        let b=true;
-            if(this.canMoveLeft()|| this.canMoveRight()||this.canMoveUp()||this.canMoveDown())
-                b=false;
             return b;
         },
         refresh() {//刷新重玩
@@ -195,6 +141,7 @@ export default {
         },
         rightUp() {//点击右键事件
             let b=false;
+            if(this.isEnd()) {
                 for(let i=0;i<4;i++) {
                     for(let j=2;j>-1;j--) {
                         for(let k=3;k>j;k--) {//k为落子点坐标
@@ -216,10 +163,14 @@ export default {
                     }
 
                 }
+            } else {
+                this.$Message.warning("游戏结束您的分数是："+this.conunta);
+            }
             return b;
         },
         bottomUp() {
             let b=false;
+            if(this.isEnd()) {
                 for(let i=0;i<4;i++) {//i为x轴j为y轴
                     for(let j=2;j>-1;j--) {//从第二排开始
                         for(let k=3;k>j;k--) {
@@ -240,10 +191,14 @@ export default {
                         }
                     }
                 }
+            } else {
+                this.$Message.warning("游戏结束您的分数是："+this.conunta);
+            }
             return b;
         },
         topUp() {
             let b=false;
+            if(this.isEnd()) {
                 for(let i=0;i<4;i++) {//i为x轴j为y轴
                     for(let j=1;j<4;j++) {//从第二排开始
                         for(let k=0;k<j;k++) {
@@ -264,10 +219,14 @@ export default {
                         }
                     }
                 }
+            } else {
+                this.$Message.warning("游戏结束您的分数是："+this.conunta);
+            }
             return b;
         },
         leftUp() {
             let b=false;
+            if(this.isEnd()) {
                 for(let i=0;i<4;i++) {
                     for(let j=1;j<4;j++) {
                         for(let k=0;k<j;k++) {
@@ -289,6 +248,9 @@ export default {
                     }
 
                 }
+            } else {
+                this.$Message.warning("游戏结束您的分数是："+this.conunta);
+            }
             return b;
         },
         monitor(_this) {
@@ -316,11 +278,10 @@ export default {
                                 _this.generate();
                             }
                             break;
-                    }
-                    if(this.nospace()&&this.nomove()) {
-                        this.$Message.warning("游戏结束您的分数是："+this.conunta);
+
                     }
                 }
+
             }
         },
 

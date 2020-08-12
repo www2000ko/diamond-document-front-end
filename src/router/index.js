@@ -6,6 +6,7 @@ import Signup from "../views/Signup.vue";
 import Info from "../views/Info.vue";
 import Forget from "../views/Forget.vue";
 import Break from "../views/Break.vue";
+import Viewdoc from "../views/ViewDoc.vue";
 Vue.use(VueRouter);
 const routes = [
   // 单纯的切换，redirect对应的是name
@@ -43,7 +44,13 @@ const routes = [
     path: "/break",
     name: "Break",
     component: Break
+  },
+  {
+    path: "/viewdoc",
+    name: "Viewdoc",
+    component: Viewdoc
   }
+
 ];
 
 const router = new VueRouter({
