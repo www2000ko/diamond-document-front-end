@@ -71,7 +71,7 @@
                 上次修改时间:{{item.modify_time}}
                 创建人:{{item.create_user}}
               </div>
-            <div class="afile">
+              <div class="afile">
               
             </div>
            </div>
@@ -114,7 +114,7 @@
             </el-form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn-confirm" @click="submitForm('createTeam_form')">确认</button>
+            <button type="button" class="btn-confirm" @click="submitCreateForm('createTeam_form'),closemeCreate()">确认</button>
             <button type="button" class="btn-close" @click="closemeCreate">关闭</button>
           </div>
         </div>
@@ -128,19 +128,30 @@
             <h3>加入团队</h3>
           </div>
           <div class="modal-body">
-            <el-form ref="createTeam_form" :model="createTeam_form" :rules="rules" label-width="80px" >
+            <el-form ref="searchTeam_form" :model="searchTeam_form" :rules="rules" label-width="80px" >
               <el-form-item label="团队名称" prop="team_name">  
                 <el-input
                 placeholder="team name"
-                v-model="createTeam_form.team_name"
+                v-model="searchTeam_form.team_name"
                 class="input-with-select"
-                ></el-input>
+                >
+                </el-input>
               </el-form-item>
+              <button type="button" class="btn-confirm" @click="submitSearchForm('searchTeam_form')" style="float: right;">确认</button>
             </el-form>
+            
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn-confirm" >确认</button>
-            <button type="button" class="btn-close" @click="closemeJoin">关闭</button>
+            <el-row>
+            <div class="team" v-for="item in searchteams" :key="item.id">
+              <div >
+                {{item.team_name}}
+                id:{{item.id}}
+                创建人:{{item.create_user}}
+              </div>
+            </div>
+            </el-row>
+            <button type="button" class="btn-close" @click="closemeJoin" style="float: right;">关闭</button>
           </div>
         </div>
       </div>
@@ -176,16 +187,20 @@ export default {
       allfiles:{},
       alldeleted:{},
       allteams:{},
+      searchteams:{},
       showCreateModal:false,
       showJoinModal:false,
       createTeam_form:{
         email: "",
         team_name:""
       },
+      searchTeam_form:{
+        team_name:"",
+      },
       rules:{
         team_name:[
           { required: true, message: '请输入团队名称', trigger: 'blur' },
-          { min: 5, max: 15, message: '长度在 5 到 15 个字符', trigger: 'blur' }
+          { max: 15, message: '长度不能大于 15 个字符', trigger: 'blur' }
         ],
       },
     };
@@ -218,16 +233,15 @@ export default {
     },
       })
     },
-    submitForm(formName) {
+    submitCreateForm(formName) {
       this.$refs[formName].validate((valid) => {
       if (valid) {
       var that = this;
       that.createTeam_form.email=global.userEmail;
       axios
-        .post("http://175.24.53.216:8080/buildteam", that.createTeam_form)//175.24.53.216:8080 127.0.0.1:8080
+        .post("http://127.0.0.1:8080/buildteam", that.createTeam_form)//175.24.53.216:8080 127.0.0.1:8080
         .then(function(response) {
           alert(response.data.msg);
-          that.closemeCreate();
         })
         .catch(function(error) {
           alert(error);
@@ -239,7 +253,26 @@ export default {
           }
         });
     },
-
+    submitSearchForm(formName) {
+      this.$refs[formName].validate((valid) => {
+      if (valid) {
+      var that = this;
+      that.createTeam_form.email=global.userEmail;
+      axios
+        .post("http://127.0.0.1:8080/searchTeam", that.searchTeam_form)//175.24.53.216:8080 127.0.0.1:8080
+        .then(function(response) {
+          that.searchteams=response.data;
+        })
+        .catch(function(error) {
+          alert(error);
+          console.log(error);
+        });
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+    },
     toggleModalCreate:function(){
       this.showCreateModal = !this.showCreateModal;
     },
@@ -403,9 +436,7 @@ export default {
 } 
 .modal-footer { 
     border-top: 1px solid #eee; 
-    justify-content: flex-end;
     padding: 15px; 
-    display: flex; 
 } 
 .modal-body { 
     position: relative; 
@@ -454,4 +485,4 @@ export default {
    width: 200px;
 } 
  
-</style>
+ </style>
