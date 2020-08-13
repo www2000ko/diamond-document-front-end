@@ -1,11 +1,11 @@
 <template>
   <div class="info">
-    <Navigator return="info" />
+    <div class="Navbar"><Navigator return="info" /></div>
     <el-container class="contianer">
     <el-aside class="card-aside">
     <!-- 第一框 -->
     <div style="margin-top: 15px;" class="card-one"  label-width="80px">
-      <el-avatar :src="this.image_url" :size="80"></el-avatar>
+      <el-avatar :src="this.image_url" :size="80" class="sidebar-avatar"></el-avatar>
       <h3 class="info-title">{{uname}} </h3>
     </div>
     
@@ -32,8 +32,15 @@
     <el-main>
     <div class="card" label-width="80px" v-if="infoflag==1">
       <h4 class="card-header">个人信息</h4>
+
       <div class="card-content">
-      头像
+      <el-row>
+      <el-col :span=6 class="prototype prototype-avatar">
+      <span style="display: table-cell;
+                  vertical-align: middle;
+                  text-align: center;">头像</span>
+      </el-col>
+      <el-col :span=18 class="cont prototype-cont">
       <div class="img-box"> 
       <el-upload
         class="avatar-uploader"
@@ -45,40 +52,56 @@
       <i v-else class="el-icon-plus avatar-uploader-icon"></i>
       </el-upload>
       </div>
-      用户名{{uname}}
-      <br/>
-      邮箱{{email}} 
-
-      <div class="radio">
+      </el-col>
+      <el-col :span=6 class="prototype">
+      用户名
+      </el-col>
+      <el-col :span=18 class="cont">
+      {{uname}}
+      </el-col>
+      <el-col :span=6 class="prototype">
+      邮箱
+      </el-col>
+      <el-col :span=18 class="cont">
+      {{email}} 
+      </el-col>
+      <el-col :span=6 class="prototype">
           性别
+      </el-col>
+      <el-col :span=18 class="cont">
           <el-radio v-model="sex" label="1">男</el-radio>
           <el-radio v-model="sex" label="0">女</el-radio>
-      </div>
-
-
+      </el-col>
+      <el-col :span=6 class="prototype">
         生日
+      </el-col>
+      <el-col :span=18 class="cont">
         <el-date-picker
           v-model="birth"
           type="date"
           placeholder="选择日期"
           >
         </el-date-picker>
-
-        <br/>
+      </el-col>
+      <el-col :span=6 class="prototype">
         联系方式
+      </el-col>
+      <el-col :span=18 class="cont">
         <el-input
-        placeholder="phonenumber"
+        placeholder="telephone number"
         v-model="phonenumber"
         ></el-input>
-
-        <br/>
+      </el-col>
+      <el-col :span=6 class="prototype">
         所在地
+      </el-col>
+      <el-col :span=18 class="cont">
         <el-input
         placeholder="location"
         v-model="location"
         ></el-input>
-
-
+      </el-col>
+      </el-row>
       <el-button
         type="primary"
         @click="confirm()"
@@ -91,26 +114,37 @@
     <!-- 第4框 -->
     <div class="card" label-width="80px" v-if="codeflag==1">
       <h4 class="card-header">账号密码</h4>
+      <el-row>
+      <el-col :span=6 class="prototype card4prototypes">
       登录帐号
+      </el-col>
+      <el-col :span=18 class="cont">
       {{email}}
-
+      </el-col></el-row>
+      <el-row>
       <el-form
         :model="code_form"
         :rules="rules"
         ref="code_form"
       >
-      新密码
+      <el-col :span=6 class="prototype card4prototypes">
+      新密码</el-col>
+      <el-col :span=18 class="cont card4input">
         <el-form-item prop="passwd1">
           <el-input type="password" v-model="code_form.passwd1"></el-input>
-        </el-form-item> 
-      确认密码
+        </el-form-item></el-col>
+      <el-col :span=6 class="prototype card4prototypes">
+      确认密码</el-col>
+      <el-col :span=18 class="cont card4input">
         <el-form-item prop="passwd2">
           <el-input type="password" v-model="code_form.passwd2"></el-input>
-        </el-form-item>
+        </el-form-item></el-col>
+      <el-col :span=6 style="border:2px solid white;"></el-col>
+      <el-col :span=18>  
         <el-form-item>
           <el-button type="primary" @click="submitForm('code_form')">修改密码</el-button>
-        </el-form-item>
-      </el-form>
+        </el-form-item></el-col>
+      </el-form></el-row>
 
     </div>
 
@@ -304,7 +338,7 @@ export default {
 </script>
 
 <style scoped>
-.avatar-uploader .el-upload {
+  .avatar-uploader .el-upload {
   }
   .avatar-uploader .el-upload:hover {
     border-color: #409EFF;
@@ -318,8 +352,48 @@ export default {
     margin:0 auto;
   }
   .avatar {
+    border: 1px solid #DCDFE6;
+    width:120px;
+    height:120px;
+    border-radius: 50%;
+    background-color:#CCFFCC;
+  }
+  .img-box {
+    //border: 1px solid #DCDFE6;
     width: 178px;
-    height: 178px;
+    margin: 10px auto;
+    padding: 0px 0px 0px 0px;
+    //border-radius: 50%;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+  }
+  .prototype {
+    float:left;
+    text-align:left;
+    //background-color:#CCCCFF;
+    height:50px;
+    margin-bottom: 10px;
+    font-weight:bold;
+    color:gray;
+  }
+  .cont {
+    //border:1px solid gray;
+    //border-radius: 5px;
+    float:right;
+    height:50px;
+    text-align:left;
+    margin-bottom: 10px;
+  }
+  .prototype-avatar {
+    height:130px;
+  }
+  .prototype-cont {
+    height:130px;
+  }
+  .card4prototypes{
+    text-indent: 1em;
+  }
+  .card4input{
   }
   .info-box {
     border: 1px solid #DCDFE6;
@@ -332,20 +406,15 @@ export default {
     -moz-border-radius: 5px;
     box-shadow: 0 0 25px #909399;
   }
-  .img-box {
-    border: 1px solid #DCDFE6;
-    width: 178px;
-    margin: 10px auto;
-    padding: 0px 0px 0px 0px;
-    border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-  }
   .info-title {
     text-align: center;
-    margin: 0 auto;
-    padding: 0px 0px 0px 10px;
+    margin-top: 30px;
+    margin-right:70px;
+    padding: 0px 0px 0px 20px;
     color: #303133;
+    float:right;
+    font-size:large;
+    //background-color:black;
   }
   .radio{
     display:block;
@@ -353,9 +422,19 @@ export default {
   }
   
   .card-header{padding:10px 15px 10px 5px;margin-left:10px;font-size:20px;line-height:30px;border-bottom:1px solid rgba(0,0,0,.12)}
+
   .card-content{padding:10px 15px 10px 5px;margin-left:10px;
     text-align:center;
-    padding: 35px 35px 15px 0px;}
+    padding: 35px 35px 15px 0px;
+    font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+    }
+
+  .card-aside {
+    margin-top:32px;
+  }
+  .sidebar-avatar{
+    background-color:#FFCCFF;
+  }
   .card-one{
     padding:10px 15px 10px 5px;
     font-size: 14px;
@@ -366,6 +445,7 @@ export default {
     box-shadow: rgba(0,0,0,.0470588) 0 2px 3px 0;
     -webkit-border-radius: 2px;
     background: #FFF;
+    margin-top:20px;
     margin-bottom: 20px;
     transition: all .3s;
     transition-delay: .1s;
@@ -404,4 +484,4 @@ export default {
     box-sizing: border-box;
     padding:10px 15px 10px 5px;
   }
-</style>
+  </style>
