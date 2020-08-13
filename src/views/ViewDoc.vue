@@ -1,10 +1,14 @@
 <template>
 <div>
 	<Navigator return="viewdoc" />
-	<div>
-		<el-container direction="horizontal">
-		<i class="el-icon-s-home" @click="tohome()"></i>
+	<div class="blank" style="height:30px"></div>
+	<div><el-row class="head">
 
+		<el-col :span="1">
+		<el-button class="button buttonRight" @click="tohome()" icon="el-icon-s-home"></el-button></el-col>
+
+		<el-col :span="7" class="docTitle">
+		<!--<el-input style="align: middle">未命名</el-input>-->
 		<div v-if="writeflag==1">
 		<div v-if="titleflag==0" @click="titleflag=1">
 			{{title}}
@@ -19,16 +23,16 @@
 		<div>
 			{{title}}
 		</div>
-		</div>
-
-		<i class="el-icon-edit" @click="changewrite()"></i>
-		<i class="el-icon-star-on"></i>
-		<i class="el-icon-star-off"></i>
-		<i class="el-icon-share"></i>
-		<i class="el-icon-delete" @click="recycle()"></i>
-		<i class="el-icon-s-claim" @click="save()"></i>
-		</el-container>
-	</div>
+		</div></el-col>
+		<el-col :span="7" class="docTitleBlank" style="border:1px solid white"></el-col>
+		<el-col :span="7">
+		<el-button class="button buttonRight" @click="changewrite()" icon="el-icon-edit"></el-button>
+		<el-button class="button buttonRight" icon="el-icon-star-on"></el-button>
+		<el-button class="button buttonRight" icon="el-icon-star-off"></el-button>
+		<el-button class="button buttonRight" icon="el-icon-share"></el-button>
+		<el-button class="button buttonRight" @click="recycle()" icon="el-icon-delete"></el-button>
+		<el-button class="button buttonRight" @click="save()" icon="el-icon-s-claim"></el-button>
+		</el-col></el-row>
 
 	<div id="md" v-if="writeflag==1">
 	      <mavon-editor class="editor" ref=md @imgAdd="$imgAdd" v-model="mdStr" @save="$save"></mavon-editor>
@@ -44,7 +48,7 @@
 	:editable="false"   
 	:scrollStyle="true"  
 	:ishljs = "true"></mavon-editor>
-	</div>
+	</div></div>
 </div>
 </template>
 
@@ -171,3 +175,31 @@ export default {
 }
 </script>
 
+<style scoped>
+ .docTitleBlank{
+    border:1px solid white;
+    font-size:200%;
+ }
+ .button {
+ }
+ el-row {
+ 	align:middle;
+ }
+ .head{
+ 	height:70px;
+ 	magin-top:200px;
+ }
+ .contianer{
+    -webkit-tap-highlight-color: transparent;
+    font-size: 14px;
+    color: #383838;
+    line-height: 20px;
+    box-sizing: border-box;
+    margin-right: auto;
+    margin-left: auto;
+    padding-left: 10px;
+    padding-right: 10px;
+    max-width: 980px;
+    width: 100%;
+  }
+</style>

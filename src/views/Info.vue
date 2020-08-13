@@ -359,26 +359,26 @@ export default {
     background-color:#CCFFCC;
   }
   .img-box {
-    //border: 1px solid #DCDFE6;
+    /* //border: 1px solid #DCDFE6; */
     width: 178px;
     margin: 10px auto;
     padding: 0px 0px 0px 0px;
-    //border-radius: 50%;
+    /* //border-radius: 50%; */
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
   }
   .prototype {
     float:left;
     text-align:left;
-    //background-color:#CCCCFF;
+    /* //background-color:#CCCCFF; */
     height:50px;
     margin-bottom: 10px;
     font-weight:bold;
     color:gray;
   }
   .cont {
-    //border:1px solid gray;
-    //border-radius: 5px;
+    /* //border:1px solid gray;
+    //border-radius: 5px; */
     float:right;
     height:50px;
     text-align:left;
@@ -414,7 +414,7 @@ export default {
     color: #303133;
     float:right;
     font-size:large;
-    //background-color:black;
+    /* //background-color:black; */
   }
   .radio{
     display:block;
