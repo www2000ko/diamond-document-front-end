@@ -141,15 +141,15 @@
             
           </div>
           <div class="modal-footer">
-            <el-row>
             <div class="team" v-for="item in searchteams" :key="item.id">
-              <div >
-                {{item.team_name}}
-                id:{{item.id}}
-                创建人:{{item.create_user}}
+              <div style="border-bottom: 1px solid #DCDFE6;">
+                <span>{{item.team_name}}</span>
+                <span>id:{{item.id}}</span>
+                <span>创建人:{{item.create_user}}</span>
+                <button type="button" class="btn-request" style="float: right;">申请加入</button>
               </div>
+              <br>
             </div>
-            </el-row>
             <button type="button" class="btn-close" @click="closemeJoin" style="float: right;">关闭</button>
           </div>
         </div>
@@ -432,12 +432,14 @@ export default {
     display: flex; 
     justify-content: center; 
     align-items: center; 
+    overflow:auto;
 }
 .modal { 
     background-color: #fff; 
     box-shadow: 2px 2px 20px 1px; 
-    overflow-x:auto; 
+    overflow:auto;
     display: flex; 
+    position: absolute;
     flex-direction: column;
     border-radius: 16px;
     width: 700px;
@@ -471,6 +473,16 @@ export default {
 }
 .btn-confirm {
     color: #fff; 
+    background-color: #2d8cf0;
+}
+.btn-request {
+    color: #fff; 
+    border-radius: 8px;
+    margin-left:16px;
+    height: 36px;
+    border:none;
+    cursor: pointer;
+    width:70;
     background-color: #2d8cf0;
 }
 .login-box {
