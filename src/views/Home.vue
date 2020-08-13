@@ -39,11 +39,12 @@
             <i class="el-icon-zoom-in"></i>
             <span slot="title" >加入团队</span>
           </el-menu-item>
-          <el-menu-item  v-for="item in allteams.data" :key="item.id">
+          <el-menu-item  v-for="item in allteams" :key="item.team_id">
+              <span slot="title">{{item.name}}</span>
+              <span>id:{{item.team_id}}</span>
           </el-menu-item>
         </el-menu-item-group>
       </el-submenu>
-
     </el-menu>
     </el-col>
     <!-- 右侧内容 -->
@@ -72,10 +73,8 @@
                 创建人:{{item.create_user}}
               </div>
               <div class="afile">
-              
             </div>
            </div>
-          
         </el-row>
 
       </div>
@@ -210,8 +209,24 @@ export default {
     this.userid=global.userid
     this.email=global.userEmail
     this.search()
+    this.myteam()
   },
   methods: {
+    myteam(){
+      var that = this;
+        axios
+          .post("http://127.0.0.1:8080/myteam", {
+            id: that.userid,
+          })
+          .then(function(response) {
+            that.allteams=response.data;
+            console.log(that.allteams);
+            alert(that.allteams)  
+          })
+          .catch(function(error) {
+            alert(error);
+          });
+    },
     tomyzone()
     {
       this.pageflag=1;
@@ -316,7 +331,7 @@ export default {
    search() {
       var that = this;
         axios
-          .post("http://175.24.53.216:8080/home", {
+          .post("http://127.0.0.1:8080/home", {
             id: that.userid,
             kind: that.searchkind
           })
@@ -333,7 +348,7 @@ export default {
             
           })
           .catch(function(error) {
-            alert(error);
+            alert("doc display"+error);
           });
   },
   }
