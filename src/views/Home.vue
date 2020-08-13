@@ -145,7 +145,7 @@
               <div style="border-bottom: 1px solid #DCDFE6;">
                 <span>{{item.team_name}}</span>
                 <span>id:{{item.id}}</span>
-                <span>创建人:{{item.create_user}}</span>
+                <span>创建人:{{item.create_user_name}}</span>
                 <button type="button" class="btn-request" style="float: right;">申请加入</button>
               </div>
               <br>
@@ -439,7 +439,6 @@ export default {
     box-shadow: 2px 2px 20px 1px; 
     overflow:auto;
     display: flex; 
-    position: absolute;
     flex-direction: column;
     border-radius: 16px;
     width: 700px;
