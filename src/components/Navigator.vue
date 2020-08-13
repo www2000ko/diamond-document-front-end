@@ -62,7 +62,9 @@ export default {
     drop(){
       global.username="";
       global.userid=0;
+      global.email
       global.loginflag=false;
+       global.userEmail="";
       this.toLogin();
     }
   }

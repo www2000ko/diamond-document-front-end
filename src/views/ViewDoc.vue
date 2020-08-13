@@ -1,16 +1,16 @@
 <template>
 <div>
 	<Navigator return="viewdoc" />
-	<div class="blank" style="height:30px"></div>
+	<div class="blank" style="height:20px"></div>
 	<div><el-row class="head">
 
 		<el-col :span="1">
-		<el-button class="button buttonRight" @click="tohome()" icon="el-icon-s-home"></el-button></el-col>
+		<el-button class="button" @click="tohome()" icon="el-icon-s-home"></el-button></el-col>
 
 		<el-col :span="7" class="docTitle">
 		<!--<el-input style="align: middle">未命名</el-input>-->
-		<div v-if="writeflag==1">
-		<div v-if="titleflag==0" @click="titleflag=1">
+		<div v-if="writeflag==1" class="title">
+		<div v-if="titleflag==0" @click="titleflag=1" class="title">
 			{{title}}
 		</div>
 		<el-input
@@ -24,8 +24,8 @@
 			{{title}}
 		</div>
 		</div></el-col>
-		<el-col :span="7" class="docTitleBlank" style="border:1px solid white"></el-col>
-		<el-col :span="7">
+		<el-col :span="4" class="docTitleBlank" style="border:1px solid white"></el-col>
+		<el-col :span="8" style="float:right;">
 		<el-button class="button buttonRight" @click="changewrite()" icon="el-icon-edit"></el-button>
 		<el-button class="button buttonRight" icon="el-icon-star-on"></el-button>
 		<el-button class="button buttonRight" icon="el-icon-star-off"></el-button>
@@ -181,6 +181,16 @@ export default {
     font-size:200%;
  }
  .button {
+	 margin: 5px;
+ }
+ .docTitle{
+	 margin: 5px;
+	 margin-left: 20px;
+
+	 text-align:center;
+ }
+ .title{
+	 text-align:center;
  }
  el-row {
  	align:middle;

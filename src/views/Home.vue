@@ -13,12 +13,12 @@
         <span slot="title" >工作台</span>
       </el-menu-item>
       
-      <el-menu-item index="2" @click="pageflag=2">
+      <el-menu-item index="2" @click="pageflag=2" :disabled="teamid!=0">
         <i class="el-icon-message"></i>
         <span slot="title" >收件箱</span>
       </el-menu-item>
 
-      <el-menu-item index="3" @click="torecycle()">
+      <el-menu-item index="3" @click="torecycle()" :disabled="teamid!=0">
         <i class="el-icon-delete"></i>
         <span slot="title" >回收站</span>
       </el-menu-item>
@@ -39,10 +39,10 @@
             <i class="el-icon-zoom-in"></i>
             <span slot="title" >加入团队</span>
           </el-menu-item>
-          <el-menu-item  v-for="item in allteams" :key="item.team_id">
-            <i :v-if="create_user==userid" class="el-icon-s-tools"></i>
-            <i :v-if="create_user!=userid" class="el-icon-tools"></i>
-              <span slot="title" @click="toTeamSpace()">{{item.name}}</span>
+          <el-menu-item  v-for="item in allteams" :key="item.id">
+            <i :v-if="item.create_user==userid" class="el-icon-s-tools"></i>
+            <i :v-if="item.create_user!=userid" class="el-icon-tools"></i>
+              <span slot="title" @click="toTeamSpace(item.id)">{{item.name}}</span>
           </el-menu-item>
         </el-menu-item-group>
       </el-submenu>
@@ -56,17 +56,17 @@
         <!-- 上方分类 -->
         <el-row>
         <el-menu default-active="1" class="el-menu-demo" mode="horizontal">
-          <el-menu-item index="1" @click="changesearchkind(1)">最近使用</el-menu-item>
-          <el-menu-item index="2" @click="changesearchkind(2)">我创建的</el-menu-item>
-          <el-menu-item index="3" @click="changesearchkind(3)">我的收藏</el-menu-item>
+          <el-menu-item index="1"  v-if="teamid!=0">团队文档</el-menu-item>
+          <el-menu-item index="1" @click="changesearchkind(1)" v-if="teamid==0">最近使用</el-menu-item>
+          <el-menu-item index="2" @click="changesearchkind(2)" v-if="teamid==0">我创建的</el-menu-item>
+          <el-menu-item index="3" @click="changesearchkind(3)" v-if="teamid==0">我的收藏</el-menu-item>
           <el-menu-item index="4" style="float:right" @click="createdoc()">新建文档</el-menu-item>
           <el-menu-item index="5" style="float:right" @click="modelVisible = true,this.modelid=0">按模版新建</el-menu-item>
         </el-menu>
         </el-row>
         <!-- 下方内容 -->
-        <el-row>
-            <div class="files" v-for="item in allfiles" :key="item.id">
-              <div>
+            <div class="files" v-for="item in allfiles" :key="item.id" >
+              <div class="box">
                 <div @click="tothisdoc(item.doc_id)">{{item.title}}</div>
                 创建时间:{{item.create_time}}
                 <div @click="openinfo(item.modify_user_email)">上次修改人:{{item.modify_user}}</div>
@@ -74,7 +74,6 @@
                 <div @click="openinfo(item.create_user_email)">创建人:{{item.create_user}}</div>
               </div>
            </div>
-        </el-row>
 <!-- 信息弹窗 -->
           <el-dialog
             title="用户信息"
@@ -114,7 +113,7 @@
       <div v-if="pageflag==3">
        <el-row>
             <div class="deletefiles" v-for="item in alldeleted" :key="item.id">
-            <div class="deletefile" @click="openremove(item.doc_id)">
+            <div class="box" @click="openremove(item.doc_id)">
               {{item.title}}
                 创建时间:{{item.create_time}}
                 上次修改人:{{item.modify_user}}
@@ -135,7 +134,7 @@
 
       <div v-if="showCreateModal">
       <div class="modal-backdrop">
-        <div class="modal" :style="mainStyles">
+        <div class="modal">
           <div class="modal-header">
             <h3>新建团队</h3>
           </div>
@@ -160,7 +159,7 @@
 
     <div v-if="showJoinModal">
       <div class="modal-backdrop">
-        <div class="modal" :style="mainStyles">
+        <div class="modal">
           <div class="modal-header">
             <h3>加入团队</h3>
           </div>
@@ -260,15 +259,16 @@ export default {
     this.search()
     this.modelid=0
     this.myteam()
-        alert(this.email);
-    alert(this.allteams);
+    if(global.userid==0){
+      this.$router.push({ path: "/login" });
+    }
   },
   methods: {
     myteam(){
       var that = this;
         axios
         // here
-          .post("http://175.24.53.216:8080/myTeam", {
+          .post("http://175.24.53.216:8080/myTeam", {//127.0.0.1:8080
             email: that.email,
           })
           .then(function(response) {
@@ -335,42 +335,43 @@ export default {
       this.modelid=id
     },
     openremove(docid) {
-        this.$confirm('是否恢复本文档?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          var that = this;
-          axios
-        .post("http://175.24.53.216:8080/recover", {
-          id: docid,
-          email: that.email,
-        })
-        .then(function(response) {
-          if(response.data.msg!="recover success")
-          {
-            alert("error")
-          }
-        })
-        .catch(function(error) {
-          alert(error);
+      this.$confirm('是否恢复本文档?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        var that = this;
+        axios
+      .post("http://175.24.53.216:8080/recover", {
+        id: docid,
+        email: that.email,
+      })
+      .then(function(response) {
+        if(response.data.msg!="recover success")
+        {
+          alert("error")
+        }
+      })
+      .catch(function(error) {
+        alert(error);
+      });
+      this.changesearchkind(4)
+        this.$message({
+          type: 'success',
+          message: '恢复成功!'
         });
-        this.changesearchkind(4)
-          this.$message({
-            type: 'success',
-            message: '恢复成功!'
-          });
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消恢复'
-          });          
-        });
-      },
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消恢复'
+        });          
+      });
+    },
     tomyzone()
     {
       this.pageflag=1;
       this.teamid=0;
+      this.search()
     },
     torecycle()
     {
@@ -383,10 +384,16 @@ export default {
       this.$router.push({
         name: "Viewdoc",
         params: {
-        kind: 0,
-        docid: docid,
-    },
+          kind: 0,
+          docid: docid,
+        },
       })
+    },
+    toTeamSpace(id){
+      this.pageflag=1;
+      this.teamid=id;
+      this.searchTeamfile();
+      console.log(this.teamid) 
     },
     submitCreateForm(formName) {
       this.$refs[formName].validate((valid) => {
@@ -398,6 +405,7 @@ export default {
         .post("http://175.24.53.216:8080/buildteam", that.createTeam_form)//175.24.53.216:8080 127.0.0.1:8080
         .then(function(response) {
           alert(response.data.msg);
+          that.myteam()
         })
         .catch(function(error) {
           alert(error);
@@ -438,76 +446,77 @@ export default {
     },
     toggleModalJoin:function(){
       this.showJoinModal = !this.showJoinModal;
+      console.log(this.showJoinModal)
     },
     closemeJoin:function(){
       this.showJoinModal = !this.showJoinModal;
     },
-  createdoc()
-  {
-    var that = this;
-        axios
-        .post("http://175.24.53.216:8080/save_new_doc", {
-          team_id: Number(that.teamid),
-          content: "",
-          title: "未命名",
-          email: that.email,
-        })
-        .then(function(response) {
-          that.$router.push({
-          name: "Viewdoc",
-          params: {
-          kind: 1,
-          docid: response.data.doc_id,
-        }
-      });
-        })
-        .catch(function(error) {
-          alert(error);
-        });
-  },
-  createdocbymodle(title,content)
-  {
-    var that = this;
-        axios
-        .post("http://175.24.53.216:8080/save_new_doc", {
-          team_id: Number(that.teamid),
-          content: content,
-          title: title,
-          email: that.email,
-        })
-        .then(function(response) {
-          that.$router.push({
-          name: "Viewdoc",
-          params: {
-          kind: 1,
-          docid: response.data.doc_id,
-        }
-      });
-        })
-        .catch(function(error) {
-          alert(error);
-        });
-  },
-  changesearchkind(aint)
-   {
-    this.searchkind=aint,
-    this.search()
-   },
-   getformcontent(thisid)
-   {
-        var that = this;
-        axios
-          .post("http://175.24.53.216:8080/get_model_content", {
-            id:thisid
+    createdoc()
+    {
+      var that = this;
+          axios
+          .post("http://127.0.0.1:8080/save_new_doc", {
+            team_id: Number(that.teamid),
+            content: "",
+            title: "未命名",
+            email: that.email,
           })
           .then(function(response) {
-              that.createdocbymodle(response.data.title,response.data.content);
+            that.$router.push({
+            name: "Viewdoc",
+            params: {
+            kind: 1,
+            docid: response.data.doc_id,
+          }
+        });
           })
           .catch(function(error) {
             alert(error);
           });
-   },
-   search() {
+    },
+    createdocbymodle(title,content)
+    {
+      var that = this;
+          axios
+          .post("http://175.24.53.216:8080/save_new_doc", {
+            team_id: Number(that.teamid),
+            content: content,
+            title: title,
+            email: that.email,
+          })
+          .then(function(response) {
+            that.$router.push({
+            name: "Viewdoc",
+            params: {
+            kind: 1,
+            docid: response.data.doc_id,
+          }
+        });
+          })
+          .catch(function(error) {
+            alert(error);
+          });
+    },
+    changesearchkind(aint)
+     {
+      this.searchkind=aint,
+      this.search()
+     },
+    getformcontent(thisid)
+    {
+         var that = this;
+         axios
+           .post("http://175.24.53.216:8080/get_model_content", {
+             id:thisid
+           })
+           .then(function(response) {
+               that.createdocbymodle(response.data.title,response.data.content);
+           })
+           .catch(function(error) {
+             alert(error);
+           });
+    },
+    search() {
       var that = this;
         axios
           .post("http://175.24.53.216:8080/home", {
@@ -529,7 +538,20 @@ export default {
           .catch(function(error) {
             alert(error);
           });
-  },
+    },
+    searchTeamfile() {
+      var that = this;
+        axios
+          .post("http://175.24.53.216:8080/get_team_doc", {
+            id: that.teamid,
+          })
+          .then(function(response) {
+              that.allfiles=response.data;
+          })
+          .catch(function(error) {
+            alert(error);
+          });
+    },
   }
 };
 </script>
@@ -547,15 +569,18 @@ export default {
 .el-icon-arrow-down {
   font-size: 12px;
 }
-  .box { 
+
+.box { 
     border: 1px solid #DCDFE6;
-    margin: 10px auto;
     padding: 10px 35px 15px 35px;
+    float:left;
+    margin: 5px;
     border-radius: 5px;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     box-shadow: 0 0 5px #909399;
-    opacity: 1
+    opacity: 1;
+    width:20%
   }
   .art-more {
 		height: 40px;
@@ -598,6 +623,7 @@ export default {
     padding-left: 10px;
 		color: #409EFF;
   }
+  
 </style>
 
 <style>
