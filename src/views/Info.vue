@@ -153,7 +153,34 @@
     <!-- 第5框 -->
     <div class="card" label-width="80px" v-if="teamflag==1">
       <h4 class="card-header">团队管理</h4>
+      <div >
+        <div v-for="item in allteams" :key="item.id">
+          <h5>{{item.name}}</h5>
+          id：{{item.id}}
+          创建日期:{{item.create_time}} 
+          创建人:{{item.create_user}}
+          团队人数：{{item.number}}
+          <el-button v-if="item.create_user_id==uid" @click="openList(item.id)">管 理</el-button>
+          <el-button v-if="item.create_user_id!=uid" @click="quitTeam(item.id)">退 出</el-button>
+          <el-divider></el-divider>
+        </div>
+      </div>
     </div>
+<!-- 团队人员管理 -->
+    <el-dialog
+          title="团队成员"
+          :visible.sync="listVisible"
+          width="30%">
+          <div v-for="item in allMembers" :key="item.id">
+              {{item.member_name}}
+              <el-divider></el-divider>
+          </div>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="listVisible = false">关 闭</el-button>
+            <el-button @click="listVisible = false,eliminate(team_id)">解散团队</el-button>
+          </span>
+    </el-dialog>
+
     </el-main>
     </el-container>
   </div>
@@ -171,7 +198,9 @@ export default {
     Navigator
   },
   created() {
-
+    this.email = global.userEmail
+    this.uid=global.userid
+    this.myteam();
   },
   data() {
     var checkpassword = (rule, value, callback) => {
@@ -199,8 +228,11 @@ export default {
             { validator: checkpassword, trigger: 'blur' }
           ]
       },
+      team_id:0,
       passwd1:"",
       passwd2:"",
+      allteams:"",
+      allMembers:"",
       location:'',
       phonenumber:'',
       birth: '',
@@ -210,8 +242,10 @@ export default {
       teamflag:0,
       sex:"1",
       uname: "临时用户",
+      uid:0,
       email: "临时邮箱",
       image_url:"临时路径",
+      listVisible:false,
     };
   },
   mounted(){
@@ -220,6 +254,82 @@ export default {
     this.getinfo();
   },
   methods: {
+    eliminate(team_id){
+      var that = this;
+      axios
+        .post("http://127.0.0.1:8080/eliminate", {
+          email: that.email,
+          id:team_id,
+        })
+        .then(function(response) {
+          console.log(response.data.msg);
+          that.$message({
+              message: '解散成功',
+              type: 'success'
+            });
+            that.myteam()
+        })
+        .catch(function(error) {
+          alert(error);
+        });
+    },
+    getTeamMember(team_id){
+      var that = this;
+      axios
+        .post("http://127.0.0.1:8080/getTeamMember", {
+          email: that.email,
+          id:team_id
+
+        })
+        .then(function(response) {
+          //that.$set()
+          that.allMembers=response.data;
+        })
+        .catch(function(error) {
+          alert(error);
+        });
+    },
+    openList(id)
+    {
+      this.listVisible = true,
+      this.team_id=id;
+      this.getTeamMember(id)
+    },
+    quitTeam(taemid){
+      var that = this;
+        axios
+        // here
+          .post("http://127.0.0.1:8080/quitteam", {//127.0.0.1:8080
+            id:taemid,
+            email: that.email,
+          })
+          .then(function(response) {
+            that.$message({
+              message: '退出成功',
+              type: 'success'
+            });
+            that.myteam()
+            console.log(response.data.msg);
+          })
+          .catch(function(error) {
+            alert(error);
+          });
+    },
+    myteam(){
+      var that = this;
+        axios
+        // here
+          .post("http://127.0.0.1:8080/myTeam", {//127.0.0.1:8080
+            email: that.email,
+          })
+          .then(function(response) {
+            that.allteams=response.data;
+            console.log(that.allteams);
+          })
+          .catch(function(error) {
+            alert(error);
+          });
+    },
     changeinfoflag() {
       (this.infoflag = 1), (this.codeflag = 0), (this.teamflag = 0);
     },
@@ -428,7 +538,9 @@ export default {
     padding: 35px 35px 15px 0px;
     font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
     }
-
+  .card-box{
+    border-bottom:1px solid rgba(0,0,0,.12);
+  }
   .card-aside {
     margin-top:32px;
   }
