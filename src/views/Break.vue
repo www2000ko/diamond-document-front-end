@@ -4,6 +4,7 @@
     <e-row>
         <e-col span=10 class="header">
         <h2>GAME BREAK</h2>
+            您请求的资源不存在。休息一下吧！
             <p>
             <Button type="primary" @click="refresh()" id="newgamebutton">New Game</Button>
             score:<span style="font-size: 20px;margin-left: 10px;">{{conunta}}</span>
