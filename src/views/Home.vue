@@ -455,7 +455,7 @@ export default {
     {
       var that = this;
           axios
-          .post("http://127.0.0.1:8080/save_new_doc", {
+          .post("http://175.24.53.216:8080/save_new_doc", {
             team_id: Number(that.teamid),
             content: "",
             title: "未命名",

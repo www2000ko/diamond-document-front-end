@@ -44,7 +44,7 @@
       <div class="img-box"> 
       <el-upload
         class="avatar-uploader"
-        action="http://127.0.0.1:8080/upload"
+        action="http://175.24.53.216:8080/upload"
         :http-request="customUpload"
         :show-file-list="false"
         :before-upload="beforeAvatarUpload">
@@ -257,7 +257,7 @@ export default {
     eliminate(team_id){
       var that = this;
       axios
-        .post("http://127.0.0.1:8080/eliminate", {
+        .post("http://175.24.53.216:8080/eliminate", {
           email: that.email,
           id:team_id,
         })
@@ -276,7 +276,7 @@ export default {
     getTeamMember(team_id){
       var that = this;
       axios
-        .post("http://127.0.0.1:8080/getTeamMember", {
+        .post("http://175.24.53.216:8080/getTeamMember", {
           email: that.email,
           id:team_id
 
@@ -299,7 +299,7 @@ export default {
       var that = this;
         axios
         // here
-          .post("http://127.0.0.1:8080/quitteam", {//127.0.0.1:8080
+          .post("http://175.24.53.216:8080/quitteam", {//127.0.0.1:8080
             id:taemid,
             email: that.email,
           })
@@ -319,7 +319,7 @@ export default {
       var that = this;
         axios
         // here
-          .post("http://127.0.0.1:8080/myTeam", {//127.0.0.1:8080
+          .post("http://175.24.53.216:8080/myTeam", {//127.0.0.1:8080
             email: that.email,
           })
           .then(function(response) {
@@ -342,7 +342,7 @@ export default {
     getinfo(){
       var that = this;
       axios
-        .post("http://127.0.0.1:8080/getinfo", {
+        .post("http://175.24.53.216:8080/getinfo", {
           email: that.email,
         })
         .then(function(response) {
@@ -362,7 +362,7 @@ export default {
     submitForm() {
       var that = this;
         axios
-          .post("http://127.0.0.1:8080/changepassword", {
+          .post("http://175.24.53.216:8080/changepassword", {
             email: that.email,
             new_password: that.code_form.passwd1,
           })
@@ -382,7 +382,7 @@ export default {
     confirm() {
       var that = this;
         axios
-          .post("http://127.0.0.1:8080/info", {
+          .post("http://175.24.53.216:8080/info", {
             email: that.email,
             name: that.uname,
             avatar: String(that.image_url),
@@ -432,7 +432,7 @@ export default {
         param.append('file',fileobj.file);
         var that= this;
         axios
-        .post("http://127.0.0.1:8080/upload",param)
+        .post("http://175.24.53.216:8080/upload",param)
         .then(function(res) {
           that.image_url=res.data.url;
           global.avatar=res.data.url;
