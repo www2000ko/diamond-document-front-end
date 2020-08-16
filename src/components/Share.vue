@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="分享" :visible.sync="dialogFormVisible" :center="false">
+  <el-dialog title="分享" :visible.sync="dialogFormVisible" :center="false" :show-close="false">
     <div slot="title">
       分享
     <el-divider></el-divider>
@@ -28,31 +28,39 @@
     </el-form>
     </div>
   <div slot="footer" class="dialog-footer">
-    <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+    <el-button type="primary" @click="onConfirm()">保 存</el-button>
     <el-button @click="dialogFormVisible = false">取 消</el-button>
-    
   </div>
 </el-dialog>
 </template>
 
 
 <script>
+import global from "@/components/global.vue";
 import QRCode from 'qrcodejs2';
+import axios from "axios";
 export default {
     data(){
       return{
         formLabelWidth:"50px",
+        isShare:false
       };
     },
     mounted (){
       this.$nextTick(()=>{
              this.qrcode();
-        if(this.isShare){
-            this.text="关闭分享";
-        }
-        else{
-          this.text="开启分享";
-        }
+             if(this.radio==0){
+               this.isShare=false;
+             }
+             else{
+               this.isShare=true;
+             }
+             if(this.isShare){
+                 this.text="关闭分享";
+             }
+             else{
+               this.text="开启分享";
+             }
    })
  },
     name: 'Share',
@@ -65,6 +73,10 @@ export default {
         type:Boolean,
         default:false
       },
+      doc_id: {
+        type: Number,
+        default:0
+      },
       input: {
         type: String,
         default:""
@@ -72,10 +84,6 @@ export default {
       text: {
         type: String,
         default:"开启分享"
-      },
-      isShare:{
-        type:Boolean,
-        default:false
       },
       isCreater:{
         type:Boolean,
@@ -115,14 +123,27 @@ export default {
           }
       },
       onConfirm(){
-          if(!this.isDisabled){
-              this.$emit('onConfirm')
-              this.$emit('input', false)
-          }
+        var that=this;
+        var permission=0;
+        if(this.isShare){
+          permission=this.radio;
+        }
+        axios
+          .post("http://175.24.53.216:8080/share_doc", {//127.0.0.1:8080
+          email:global.userEmail,
+          permission:permission,
+          id:that.doc_id
+          })
+          .then(function(response) {
+            console.log(response.data);
+          })
+          .catch(function(error) {
+            alert(error);
+          });
+        this.$emit('ShareConfirm',this.radio);
       },
       onCancel(){
-        this.$emit('onCancel')
-        this.$emit('input', false)
+        this.$emit('ShareCancel');
       }
     }
 }
