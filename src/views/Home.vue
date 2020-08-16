@@ -13,7 +13,7 @@
         <span slot="title" >工作台</span>
       </el-menu-item>
       
-      <el-menu-item index="2" @click="pageflag=2" :disabled="teamid!=0">
+      <el-menu-item index="2" @click="tomessage()" :disabled="teamid!=0">
         <i class="el-icon-message"></i>
         <span slot="title" >收件箱</span>
       </el-menu-item>
@@ -79,13 +79,22 @@
             title="用户信息"
             :visible.sync="infoVisible"
             width="30%">
-            <span>{{userinfo.name}}</span>
-            <span>{{userinfo.email}}</span>
-            <span>{{userinfo.avatar}}</span>
-            <span>{{userinfo.gender}}</span>
-            <span>{{userinfo.phone}}</span>
-            <span>{{userinfo.birthday}}</span>
-            <span>{{userinfo.address}}</span>
+            <el-row class="InfoDialog">
+            <el-col class="sidebar-avatar"><el-avatar :src="userinfo.avatar" :size="100"></el-avatar></el-col>
+            <el-col class="sidebar-name">{{userinfo.name}}</el-col>
+            <el-col class="prototype" :span="6">邮箱</el-col>
+            <el-tooltip class="email-detail" effect="dark" :content="userinfo.email" placement="top-start">
+            <el-col class="value" :span="18">{{userinfo.email}}</el-col></el-tooltip>
+            <el-col class="prototype" :span="6">性别</el-col>
+            <el-col class="value" :span="18" v-if="userinfo.gender==1">男</el-col>
+            <el-col class="value" :span="18" v-else>女</el-col>
+            <el-col class="prototype" :span="6">联系电话</el-col>
+            <el-col class="value" :span="18">{{userinfo.phone}}</el-col>
+            <el-col class="prototype" :span="6">生日</el-col>
+            <el-col class="value" :span="18">{{userinfo.birthday}}</el-col>
+            <el-col class="prototype" :span="6">地址</el-col>
+            <el-col class="value" :span="18">{{userinfo.address}}</el-col>
+            </el-row>
           </el-dialog>
       </div>
 <!-- 模版界面 -->
@@ -106,8 +115,84 @@
 
 
       <!-- 收件箱页面 -->
+
       <div v-if="pageflag==2">
-        hi2
+
+        <template>
+            <el-table
+              :data="tableData"
+              style="width: 100%"
+              stripe
+              :default-sort = "{prop: 'send_time', order: 'descending'}"
+              >
+              <el-table-column
+                prop="sender_name"
+                label="发件人"
+                sortable
+                width="100">
+              </el-table-column>
+              <el-table-column
+                prop="send_time"
+                label="时间"
+                sortable
+                width="240">
+              </el-table-column>
+              <el-table-column
+                prop="status"
+                label="状态"
+                sortable
+                width="240">
+                 <template slot-scope="scope">
+                <el-tag
+                  type="warning" v-if="scope.row.status==0">未读</el-tag>
+                  <el-tag v-if="scope.row.status!=0">已读</el-tag>
+                 </template>
+              </el-table-column>
+              <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button
+                  size="mini"
+                  @click="handleShow(scope.$index, scope.row)">查看</el-button>
+                <el-button
+                  size="mini"
+                  type="danger"
+                  @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+            </el-table>
+          </template>
+<!-- 查看信息 -->
+          <el-dialog
+            title="查看消息"
+            :visible.sync="messageVisible"
+            width="30%"
+            :show-close="false"
+            :close-on-click-modal="false"
+            >
+            <span>发件人：{{messagecontent.sender_name}}</span><br/>
+            <span>发送时间：{{messagecontent.send_time}}</span><br/>
+            <span v-if="messagecontent.type==0"> {{messagecontent.sender_name}}邀请你加入团队"{{messagecontent.team_name}}"</span>
+            <span v-if="messagecontent.type==1"> {{messagecontent.sender_name}}申请加入你的团队"{{messagecontent.team_name}}"</span>
+            <span v-if="messagecontent.type==2"> {{messagecontent.sender_name}}退出了你的团队"{{messagecontent.team_name}}"</span>
+            <span v-if="messagecontent.type==3"> {{messagecontent.sender_name}}修改了你的团队"{{messagecontent.team_name}}"中的文档《{{messagecontent.doc_name}}》</span>
+            <span v-if="messagecontent.type==4"> {{messagecontent.sender_name}}修改了你的个人文档《{{messagecontent.doc_name}}》</span>
+            <span v-if="messagecontent.type==5"> {{messagecontent.sender_name}}评论了你的团队"{{messagecontent.team_name}}"中的文档《{{messagecontent.doc_name}}》</span>
+            <span v-if="messagecontent.type==6"> {{messagecontent.sender_name}}评论了你的个人文档《{{messagecontent.doc_name}}》</span>
+            <span v-if="messagecontent.type==7"> </span>
+
+
+
+            <span slot="footer" class="dialog-footer">
+              <el-button type="primary" @click="agree()" v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==0)">同 意</el-button>
+              <el-button @click="disagree()" v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==0)">拒 绝</el-button>
+              <el-button disable v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==1)">已同意</el-button>
+              <el-button disable v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==2)">已拒绝</el-button>
+              <el-button type="primary" @click="messageVisible = false,closemessage" v-if="!((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==0)">确 定</el-button>
+            </span>
+          </el-dialog>
+
+
+        
       </div>
       <!-- 回收站页面 -->
       <div v-if="pageflag==3">
@@ -208,7 +293,7 @@
 import Navigator from "@/components/Navigator.vue";
 import global from "@/components/global.vue";
 import axios from "axios";
-
+import jwt_decode from 'jwt-decode';
 export default {
   name: "Home",
   components: {
@@ -216,7 +301,10 @@ export default {
   },
   data() {
     return {
+      tableData: {},
       modelVisible:false,
+      messageVisible:false,
+      messagecontent:{},
       modelid:0,
       teamid:0,
       userid:0,
@@ -233,7 +321,8 @@ export default {
       allforms:{
         "1":{"id":1,"title":"笔记"},
         "2":{"id":2,"title":"代码"},
-        "3":{"id":3,"title":"列表"}
+        "3":{"id":3,"title":"列表"},
+        "4":{"id":4,"title":"公式"}
       },
       showCreateModal:false,
       showJoinModal:false,
@@ -254,6 +343,15 @@ export default {
   },
   created()
   {
+    if(this.$store.getters.getToken){
+      const decoded = jwt_decode(this.$store.getters.getToken);
+      console.log(decoded);
+      global.loginflag=true;
+      global.userName=decoded.name;
+      global.userEmail=decoded.email;
+      global.avatar=decoded.avatar;
+      global.userid=decoded.id;
+    }
     this.userid=global.userid
     this.email=global.userEmail
     this.search()
@@ -264,6 +362,85 @@ export default {
     }
   },
   methods: {
+    disagree()
+    {
+        var that = this;
+        axios
+        // here
+          .post("http://175.24.53.216:8080/read_message", {//127.0.0.1:8080
+          status:2,
+          id:that.messagecontent.id
+          })
+          .then(function(response) {
+            console.log(response.data);
+            that.messagecontent.status=2
+          })
+          .catch(function(error) {
+            alert(error);
+          });
+    },
+    agree()
+    {
+        var that = this;
+        axios
+        // here
+          .post("http://175.24.53.216:8080/read_message", {//127.0.0.1:8080
+          status:1,
+          id:that.messagecontent.id
+          })
+          .then(function(response) {
+            console.log(response.data);
+            that.messagecontent.status=1
+          })
+          .catch(function(error) {
+            alert(error);
+          });
+    },
+    readthismessage()
+    {
+        var that = this;
+        axios
+        // here
+          .post("http://175.24.53.216:8080/read_message", {//127.0.0.1:8080
+          status:1,
+          id:that.messagecontent.id
+          })
+          .then(function(response) {
+            console.log(response.data);
+            that.messagecontent.status=1
+            that.getallmessage()
+          })
+          .catch(function(error) {
+            alert(error);
+          });
+    },
+    handleShow(index, row) {
+        this.messagecontent=row
+        if(this.messagecontent.type!=0&&this.messagecontent.type!=1)
+        {
+          this.readthismessage()
+        }
+        this.messageVisible=true
+      },
+      handleDelete(index, row) {
+        alert(index);
+        alert(row);
+        alert(row.sender_name);
+      },
+    getallmessage(){
+      var that = this;
+        axios
+        // here
+          .post("http://175.24.53.216:8080/get_message", {//127.0.0.1:8080
+            token: String(that.$store.getters.getToken).substring(1,String(that.$store.getters.getToken).length-1),
+          })
+          .then(function(response) {
+            that.tableData=response.data;
+          })
+          .catch(function(error) {
+            alert(error);
+          });
+    },
     myteam(){
       var that = this;
         axios
@@ -316,10 +493,7 @@ export default {
               .then(function(response) {
                 that.$router.push({
                 name: "Viewdoc",
-                params: {
-                kind: 1,
-                docid: response.data.doc_id,
-              }
+                query: { kind: 1,docid: response.data.doc_id }
             });
               })
               .catch(function(error) {
@@ -341,25 +515,25 @@ export default {
         type: 'warning'
       }).then(() => {
         var that = this;
-        axios
-      .post("http://175.24.53.216:8080/recover", {
-        id: docid,
-        email: that.email,
-      })
-      .then(function(response) {
-        if(response.data.msg!="recover success")
-        {
-          alert("error")
-        }
-      })
-      .catch(function(error) {
-        alert(error);
-      });
-      this.changesearchkind(4)
-        this.$message({
+                axios
+                .post("http://175.24.53.216:8080/recover", {
+                  id: docid,
+                  email: that.email,
+                })
+                .then(function(response) {
+                  if(response.data.msg!="recover success")
+                  {
+                    alert("error")
+                  }
+                })
+                .catch(function(error) {
+                  alert(error);
+                });
+        that.$message({
           type: 'success',
           message: '恢复成功!'
         });
+        that.changesearchkind(4)
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -367,11 +541,17 @@ export default {
         });          
       });
     },
+    tomessage()
+    {
+      this.pageflag=2;
+      this.teamid=0;
+      this.getallmessage()
+    },
     tomyzone()
     {
       this.pageflag=1;
       this.teamid=0;
-      this.search()
+      this.changesearchkind(1)
     },
     torecycle()
     {
@@ -380,14 +560,10 @@ export default {
     },
     tothisdoc(docid)
     {
-      alert(docid)
       this.$router.push({
-        name: "Viewdoc",
-        params: {
-          kind: 0,
-          docid: docid,
-        },
-      })
+               name:"Viewdoc",
+               query: { kind: 0,docid: docid }
+        })
     },
     toTeamSpace(id){
       this.pageflag=1;
@@ -464,10 +640,7 @@ export default {
           .then(function(response) {
             that.$router.push({
             name: "Viewdoc",
-            params: {
-            kind: 1,
-            docid: response.data.doc_id,
-          }
+            query: { kind: 1,docid: response.data.doc_id }
         });
           })
           .catch(function(error) {
@@ -487,10 +660,7 @@ export default {
           .then(function(response) {
             that.$router.push({
             name: "Viewdoc",
-            params: {
-            kind: 1,
-            docid: response.data.doc_id,
-          }
+            query: { kind: 1, docid: response.data.doc_id }
         });
           })
           .catch(function(error) {
@@ -581,6 +751,38 @@ export default {
     box-shadow: 0 0 5px #909399;
     opacity: 1;
     width:20%
+  }
+.boxName:hover,.boxAuthor:hover{
+  font-size: 15px;
+  font-weight: bold;
+  text-decoration:underline;
+  cursor:pointer;
+  }
+  .sidebar-avatar,.sidebar-name{
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .sidebar-name{
+    color:black;
+    font-size: 20px;
+  }
+  .prototype,.value{
+    margin-bottom: 20px;
+    /* &:last-child {
+      margin-bottom: 0;
+    } */
+  }
+  .value{
+    color:black;
+  }
+  .template-item:hover{
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+  .template-item:visited{
+    border:1px solid black;
   }
   .art-more {
 		height: 40px;

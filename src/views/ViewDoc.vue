@@ -5,7 +5,7 @@
 	<div><el-row class="head">
 
 		<el-col :span="1">
-		<el-button class="button" @click="tohome()" icon="el-icon-s-home"></el-button></el-col>
+		<el-button class="button" type="primary" @click="tohome()" icon="el-icon-s-home" circle></el-button></el-col>
 
 		<el-col :span="7" class="docTitle">
 		<!--<el-input style="align: middle">未命名</el-input>-->
@@ -26,13 +26,35 @@
 		</div></el-col>
 		<el-col :span="4" class="docTitleBlank" style="border:1px solid white"></el-col>
 		<el-col :span="8" style="float:right;">
-		<el-button class="button buttonRight" @click="changewrite()" icon="el-icon-edit"></el-button>
-		<el-button class="button buttonRight" icon="el-icon-star-on"></el-button>
-		<el-button class="button buttonRight" icon="el-icon-star-off"></el-button>
-		<el-button class="button buttonRight" icon="el-icon-share"></el-button>
-		<el-button class="button buttonRight" @click="recycle()" icon="el-icon-delete"></el-button>
-		<el-button class="button buttonRight" @click="save()" icon="el-icon-s-claim"></el-button>
+		<el-button class="button buttonRight" type="primary" @click="changewrite()" icon="el-icon-edit" circle :disabled="writeflag==1"></el-button>
+		<el-button class="button buttonRight" type="warning" icon="el-icon-star-on" v-if="likeflag==true" @click="dislike()" circle></el-button>
+		<el-button class="button buttonRight" icon="el-icon-star-off" v-if="likeflag==false" @click="addlike()" circle></el-button>
+		<el-button class="button buttonRight" type="info" icon="el-icon-chat-line-square" @click="drawer = true,getallcomment()" circle :disabled="writeflag==1"></el-button>
+		<el-button class="button buttonRight" type="warning" icon="el-icon-share" circle></el-button>
+		<el-button class="button buttonRight" type="danger" @click="recycle()" icon="el-icon-delete" circle></el-button>
+		<el-button class="button buttonRight" type="success" @click="save()" icon="el-icon-finished" circle :disabled="writeflag==0"></el-button>
 		</el-col></el-row>
+
+
+<!-- 评论页面 -->
+<el-drawer
+  title="评论"
+  :visible.sync="drawer"
+  :direction="direction">
+  <div v-for="item in commentlist" :key="item.id" style="margin-top: 15px;">
+	  {{item.comment_user}}
+	  {{item.content}}
+	  {{item.comment_time}}
+
+  </div>
+  <div style="margin-top: 15px;">
+  <el-input placeholder="请输入评论" v-model="comment">
+    <el-button slot="append" icon="el-icon-s-promotion" @click="addcomment()"></el-button>
+  </el-input>
+</div>
+</el-drawer>
+
+
 
 	<div id="md" v-if="writeflag==1">
 	      <mavon-editor class="editor" ref=md @imgAdd="$imgAdd" v-model="mdStr" @save="$save"></mavon-editor>
@@ -56,30 +78,135 @@
 import axios from "axios";
 import global from "@/components/global.vue";
 import Navigator from "@/components/Navigator.vue";
+import jwt_decode from 'jwt-decode';
 export default {
 	name:'ViewDoc',
 	props:[],
 	components:{Navigator},
 	data(){
 	  return {
+		comment:"",
+		likeflag:false,
 		docid:0,
 		teamid:0,
 		email:"临时邮箱",
 		writeflag:0,
 		titleflag:0,
 		title:"未命名",
-		mdStr:""
+		mdStr:"",
+		drawer: false,
+		direction: 'rtl',
+		commentlist: {}
 	  }
 
 		
 	},
 	created(){
-		this.writeflag = this.$route.params.kind;
-		this.docid = this.$route.params.docid;
+	  if(this.$store.getters.getToken){
+      const decoded = jwt_decode(this.$store.getters.getToken);
+      console.log(decoded);
+      global.loginflag=true;
+      global.userName=decoded.name;
+      global.userEmail=decoded.email;
+      global.avatar=decoded.avatar;
+      global.userid=decoded.id;
+    }
+		this.writeflag = this.$route.query.kind;
+		this.docid = this.$route.query.docid;
 		this.email = global.userEmail;
 		this.getdoc();
+		this.getlike();
 	},
 	methods:{
+		getallcomment(){
+			var that = this;
+			axios
+			.post("http://175.24.53.216:8080/get_comment", {
+			id:Number(that.docid),
+			})
+			.then(function(response) {
+			   that.commentlist=response.data
+			})
+			.catch(function(error) {
+			alert(error);
+			});
+		},
+		addcomment(){
+			var that = this;
+			axios
+			.post("http://175.24.53.216:8080/comment", {
+			id:Number(that.docid),
+			email: that.email,
+			content:that.comment
+			})
+			.then(function(response) {
+				console.log(response.data.msg)
+				that.$message({
+					type: 'success',
+					message: '评论成功!'
+				});
+			  that.comment=""
+			  that.getallcomment()
+			})
+			.catch(function(error) {
+			alert(error);
+			});
+		},
+		addlike(){
+			var that = this;
+			axios
+			.post("http://175.24.53.216:8080/like_doc", {
+			id:Number(that.docid),
+			email: that.email,
+			})
+			.then(function(response) {
+				console.log(response.data.msg)
+				that.$message({
+					type: 'success',
+					message: '关注成功!'
+				});
+			  that.likeflag=true
+			})
+			.catch(function(error) {
+			alert(error);
+			});
+		},
+		dislike(){
+			var that = this;
+			axios
+			.post("http://175.24.53.216:8080/dislike_doc", {
+			id:Number(that.docid),
+			email: that.email,
+			})
+			.then(function(response) {
+			  console.log(response.data.msg)
+				that.$message({
+					type: 'success',
+					message: '已取消关注!'
+				});
+			  that.likeflag=false
+			})
+			.catch(function(error) {
+			alert(error);
+			});
+		},
+		getlike(){
+			var that = this;
+			axios
+			.post("http://175.24.53.216:8080/check_favorite_doc", {
+			id:Number(that.docid),
+			email: that.email,
+			})
+			.then(function(response) {
+			  if(response.data.flag==1)
+			  {
+				that.likeflag=true
+			  }
+			})
+			.catch(function(error) {
+			alert(error);
+			});
+		},
 		getdoc(){
 			var that = this;
 			axios
@@ -110,6 +237,7 @@ export default {
 			})
 			.then(function(response) {
 			alert(response.data.msg);
+			that.tohome();
 			})
 			.catch(function(error) {
 			alert(error);
@@ -144,7 +272,8 @@ export default {
           email: that.email,
         })
         .then(function(response) {
-          that.$message(response.data.msg);
+		  that.$message(response.data.msg);
+		  that.writeflag=0
         })
         .catch(function(error) {
           alert(error);
@@ -165,7 +294,8 @@ export default {
           email: that.email,
         })
         .then(function(response) {
-          alert(response.data.msg);
+		  alert(response.data.msg);
+		  that.writeflag=0
         })
         .catch(function(error) {
           alert(error);

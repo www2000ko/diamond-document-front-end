@@ -49,11 +49,8 @@ const routes = [
     path: "/viewdoc",
     name: "Viewdoc",
     component: Viewdoc
-  },
-  {
-    path: '*', // 404 页面
-    redirect:'/break'  // 重定向到下方声明的路由
   }
+
 ];
 
 const router = new VueRouter({

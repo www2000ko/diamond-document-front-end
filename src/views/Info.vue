@@ -44,7 +44,7 @@
       <div class="img-box"> 
       <el-upload
         class="avatar-uploader"
-        action="http://175.24.53.216:8080/upload"
+        action="http://127.0.0.1:8080/upload"
         :http-request="customUpload"
         :show-file-list="false"
         :before-upload="beforeAvatarUpload">
@@ -153,34 +153,7 @@
     <!-- 第5框 -->
     <div class="card" label-width="80px" v-if="teamflag==1">
       <h4 class="card-header">团队管理</h4>
-      <div >
-        <div v-for="item in allteams" :key="item.id">
-          <h5>{{item.name}}</h5>
-          id：{{item.id}}
-          创建日期:{{item.create_time}} 
-          创建人:{{item.create_user}}
-          团队人数：{{item.number}}
-          <el-button v-if="item.create_user_id==uid" @click="openList(item.id)">管 理</el-button>
-          <el-button v-if="item.create_user_id!=uid" @click="quitTeam(item.id)">退 出</el-button>
-          <el-divider></el-divider>
-        </div>
-      </div>
     </div>
-<!-- 团队人员管理 -->
-    <el-dialog
-          title="团队成员"
-          :visible.sync="listVisible"
-          width="30%">
-          <div v-for="item in allMembers" :key="item.id">
-              {{item.member_name}}
-              <el-divider></el-divider>
-          </div>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="listVisible = false">关 闭</el-button>
-            <el-button @click="listVisible = false,eliminate(team_id)">解散团队</el-button>
-          </span>
-    </el-dialog>
-
     </el-main>
     </el-container>
   </div>
@@ -192,15 +165,22 @@
 import axios from "axios";
 import Navigator from "@/components/Navigator.vue";
 import global from "@/components/global.vue";
+import jwt_decode from 'jwt-decode';
 export default {
   name: "Info",
   components: {
     Navigator
   },
   created() {
-    this.email = global.userEmail
-    this.uid=global.userid
-    this.myteam();
+    if(this.$store.getters.getToken){
+      const decoded = jwt_decode(this.$store.getters.getToken);
+      console.log(decoded);
+      global.loginflag=true;
+      global.userName=decoded.name;
+      global.userEmail=decoded.email;
+      global.avatar=decoded.avatar;
+      global.userid=decoded.id;
+    }
   },
   data() {
     var checkpassword = (rule, value, callback) => {
@@ -228,11 +208,8 @@ export default {
             { validator: checkpassword, trigger: 'blur' }
           ]
       },
-      team_id:0,
       passwd1:"",
       passwd2:"",
-      allteams:"",
-      allMembers:"",
       location:'',
       phonenumber:'',
       birth: '',
@@ -242,10 +219,8 @@ export default {
       teamflag:0,
       sex:"1",
       uname: "临时用户",
-      uid:0,
       email: "临时邮箱",
       image_url:"临时路径",
-      listVisible:false,
     };
   },
   mounted(){
@@ -254,82 +229,6 @@ export default {
     this.getinfo();
   },
   methods: {
-    eliminate(team_id){
-      var that = this;
-      axios
-        .post("http://175.24.53.216:8080/eliminate", {
-          email: that.email,
-          id:team_id,
-        })
-        .then(function(response) {
-          console.log(response.data.msg);
-          that.$message({
-              message: '解散成功',
-              type: 'success'
-            });
-            that.myteam()
-        })
-        .catch(function(error) {
-          alert(error);
-        });
-    },
-    getTeamMember(team_id){
-      var that = this;
-      axios
-        .post("http://175.24.53.216:8080/getTeamMember", {
-          email: that.email,
-          id:team_id
-
-        })
-        .then(function(response) {
-          //that.$set()
-          that.allMembers=response.data;
-        })
-        .catch(function(error) {
-          alert(error);
-        });
-    },
-    openList(id)
-    {
-      this.listVisible = true,
-      this.team_id=id;
-      this.getTeamMember(id)
-    },
-    quitTeam(taemid){
-      var that = this;
-        axios
-        // here
-          .post("http://175.24.53.216:8080/quitteam", {//127.0.0.1:8080
-            id:taemid,
-            email: that.email,
-          })
-          .then(function(response) {
-            that.$message({
-              message: '退出成功',
-              type: 'success'
-            });
-            that.myteam()
-            console.log(response.data.msg);
-          })
-          .catch(function(error) {
-            alert(error);
-          });
-    },
-    myteam(){
-      var that = this;
-        axios
-        // here
-          .post("http://175.24.53.216:8080/myTeam", {//127.0.0.1:8080
-            email: that.email,
-          })
-          .then(function(response) {
-            that.allteams=response.data;
-            console.log(that.allteams);
-          })
-          .catch(function(error) {
-            alert(error);
-          });
-    },
     changeinfoflag() {
       (this.infoflag = 1), (this.codeflag = 0), (this.teamflag = 0);
     },
@@ -342,7 +241,7 @@ export default {
     getinfo(){
       var that = this;
       axios
-        .post("http://175.24.53.216:8080/getinfo", {
+        .post("http://127.0.0.1:8080/getinfo", {
           email: that.email,
         })
         .then(function(response) {
@@ -362,7 +261,7 @@ export default {
     submitForm() {
       var that = this;
         axios
-          .post("http://175.24.53.216:8080/changepassword", {
+          .post("http://127.0.0.1:8080/changepassword", {
             email: that.email,
             new_password: that.code_form.passwd1,
           })
@@ -382,7 +281,7 @@ export default {
     confirm() {
       var that = this;
         axios
-          .post("http://175.24.53.216:8080/info", {
+          .post("http://127.0.0.1:8080/info", {
             email: that.email,
             name: that.uname,
             avatar: String(that.image_url),
@@ -432,7 +331,7 @@ export default {
         param.append('file',fileobj.file);
         var that= this;
         axios
-        .post("http://175.24.53.216:8080/upload",param)
+        .post("http://127.0.0.1:8080/upload",param)
         .then(function(res) {
           that.image_url=res.data.url;
           global.avatar=res.data.url;
@@ -538,9 +437,7 @@ export default {
     padding: 35px 35px 15px 0px;
     font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
     }
-  .card-box{
-    border-bottom:1px solid rgba(0,0,0,.12);
-  }
+
   .card-aside {
     margin-top:32px;
   }

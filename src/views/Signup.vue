@@ -121,7 +121,7 @@ export default {
              console.log('yes submit!!')
              var that = this;
       axios
-        .post("http://175.24.53.216:8080/signup", {
+        .post("http://127.0.0.1:8080/signup", {
           uname:that.regist_form.uname,
           passwd1:that.regist_form.passwd1,
           email:that.regist_form.email
@@ -145,7 +145,7 @@ export default {
       var that=this;
       that.code=Math.floor(Math.random() * (999999 - 100000) + 100000);
       axios
-        .post("http://175.24.53.216:8080/verification", {
+        .post("http://127.0.0.1:8080/verification", {
           type:"1",
           email: that.regist_form.email,
           code:String(that.code)

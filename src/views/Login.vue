@@ -32,6 +32,7 @@
 import axios from "axios";
 import Navigator from "@/components/Navigator.vue";
 import global from "@/components/global.vue";
+import jwt_decode from 'jwt-decode';
 export default {
   name: "Login",
   components: {
@@ -74,11 +75,14 @@ export default {
         .then(function(response) {
           alert(response.data.msg);
           if (response.data.msg == "login success") {
-            global.loginflag = true;
-            global.userName = response.data.name;
-            global.userEmail = response.data.email;
-            global.userid = response.data.id;
-            global.avatar = response.data.avater;
+            const decoded = jwt_decode(response.data.token);            
+            console.log(decoded);            
+            global.loginflag = true;            
+            global.userName = decoded.name;            
+            global.userid = decoded.id;            
+            global.avatar=decoded.avater;        
+            global.userEmail = decoded.email;     
+            that.$store.commit('setToken',response.data.token);
             //alert(Navigator.username );
             //this.forceUpdate();
             //this.$root.username = that.uname;

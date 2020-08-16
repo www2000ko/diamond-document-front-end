@@ -4,7 +4,6 @@
     <e-row>
         <e-col span=10 class="header">
         <h2>GAME BREAK</h2>
-            您请求的资源不存在。休息一下吧！
             <p>
             <Button type="primary" @click="refresh()" id="newgamebutton">New Game</Button>
             score:<span style="font-size: 20px;margin-left: 10px;">{{conunta}}</span>
@@ -14,55 +13,55 @@
         <e-col span=18 >
         <div class="jiu">
             <div class="grid-cell" id="grid-cell-0-0">
-                <div class="cell" v-if="a00">{{a00}}</div>
+                <div class="celll" v-if="a00">{{a00}}</div>
             </div>
             <div class="grid-cell" id="grid-cell-0-1">
-                <div class="cell" v-if="a01">{{a01}}</div>
+                <div class="celll" v-if="a01">{{a01}}</div>
             </div>
             <div class="grid-cell" id="grid-cell-0-2">
-                <div class="cell" v-if="a02">{{a02}}</div>
+                <div class="celll" v-if="a02">{{a02}}</div>
             </div>
             <div class="grid-cell" id="grid-cell-0-3">
-                <div class="cell" v-if="a03">{{a03}}</div>
+                <div class="celll" v-if="a03">{{a03}}</div>
             </div>
 
             <div class="grid-cell" id="grid-cell-1-0">
-                <div class="cell" v-if="a10">{{a10}}</div>
+                <div class="celll" v-if="a10">{{a10}}</div>
             </div>
             <div class="grid-cell" id="grid-cell-1-1">
-                <div class="cell" v-if="a11">{{a11}}</div>
+                <div class="celll" v-if="a11">{{a11}}</div>
             </div>
             <div class="grid-cell" id="grid-cell-1-2">
-                <div class="cell" v-if="a12">{{a12}}</div>
+                <div class="celll" v-if="a12">{{a12}}</div>
             </div>
             <div class="grid-cell" id="grid-cell-1-3">
-                <div class="cell" v-if="a13">{{a13}}</div>
+                <div class="celll" v-if="a13">{{a13}}</div>
             </div>
 
             <div class="grid-cell" id="grid-cell-2-0">
-                <div class="cell" v-if="a20">{{a20}}</div>
+                <div class="celll" v-if="a20">{{a20}}</div>
             </div>
             <div class="grid-cell" id="grid-cell-2-1">
-                <div class="cell" v-if="a21">{{a21}}</div>
+                <div class="celll" v-if="a21">{{a21}}</div>
             </div>
             <div class="grid-cell" id="grid-cell-2-2">
-                <div class="cell" v-if="a22">{{a22}}</div>
+                <div class="celll" v-if="a22">{{a22}}</div>
             </div>
             <div class="grid-cell" id="grid-cell-2-3">
-                <div class="cell" v-if="a23">{{a23}}</div>
+                <div class="celll" v-if="a23">{{a23}}</div>
             </div>
 
             <div class="grid-cell" id="grid-cell-3-0">
-                <div class="cell" v-if="a30">{{a30}}</div>
+                <div class="celll" v-if="a30">{{a30}}</div>
             </div>
             <div class="grid-cell" id="grid-cell-3-1">
-                <div class="cell" v-if="a31">{{a31}}</div>
+                <div class="celll" v-if="a31">{{a31}}</div>
             </div>
             <div class="grid-cell" id="grid-cell-3-2">
-                <div class="cell" v-if="a32">{{a32}}</div>
+                <div class="celll" v-if="a32">{{a32}}</div>
             </div>
             <div class="grid-cell" id="grid-cell-3-3">
-                <div class="cell" v-if="a33">{{a33}}</div>
+                <div class="celll" v-if="a33">{{a33}}</div>
             </div>
         </div>
         </e-col>
@@ -73,7 +72,7 @@
 <script>
 // @ is an alias to /src
 import Navigator from "@/components/Navigator.vue";
-
+import jwt_decode from 'jwt-decode';
 export default {
     name: 'Break',
   components: {
@@ -86,6 +85,17 @@ export default {
             a00: "",a01: "",a02: "",a03: "",a10: "",a11: "",a12: "",a13: "",a20: "",a21: "",a22: "",
             a23: "",a30: "",a31: "",a32: "",a33: ""
         }
+    },
+    created(){
+      if(this.$store.getters.getToken){
+      const decoded = jwt_decode(this.$store.getters.getToken);
+      console.log(decoded);
+      global.loginflag=true;
+      global.userName=decoded.name;
+      global.userEmail=decoded.email;
+      global.avatar=decoded.avatar;
+      global.userid=decoded.id;
+    }
     },
     computed: {
         conunta: function() {//记录总分数
@@ -411,7 +421,7 @@ export default {
   border-radius: 10px;
 }
 
-.cell {
+.celll {
   line-height: 72px;
   background: #64baff;
   border-width: 2px;
