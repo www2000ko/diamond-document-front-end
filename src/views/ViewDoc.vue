@@ -322,12 +322,9 @@ export default {
  .title{
 	 text-align:center;
  }
- el-row {
- 	align:middle;
- }
  .head{
  	height:70px;
- 	magin-top:200px;
+ 	margin-top:200px;
  }
  .contianer{
     -webkit-tap-highlight-color: transparent;

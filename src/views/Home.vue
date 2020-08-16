@@ -40,7 +40,7 @@
             <span slot="title" >加入团队</span>
           </el-menu-item>
           <el-menu-item  v-for="item in allteams" :key="item.id">
-            <i :v-if="item.create_user==userid" class="el-icon-s-tools"></i>
+            <i :v-if="item.create_user==userid" class="el-icon-s-tools" @click="listVisible=true"></i>
             <i :v-if="item.create_user!=userid" class="el-icon-tools"></i>
               <span slot="title" @click="toTeamSpace(item.id)">{{item.name}}</span>
           </el-menu-item>
@@ -277,14 +277,8 @@
         </div>
       </div>
     </div>
-
+    <TeamManagement :listVisible="listVisible" :team_id="teamid" v-on:TeamManagementCancel="listVisible=false"></TeamManagement>
   </div>
-
-
-
-
-
-  
 </template>
 
 
@@ -294,14 +288,17 @@ import Navigator from "@/components/Navigator.vue";
 import global from "@/components/global.vue";
 import axios from "axios";
 import jwt_decode from 'jwt-decode';
+import TeamManagement from "@/components/TeamManagement.vue";
 export default {
   name: "Home",
   components: {
-    Navigator
+    Navigator,
+    TeamManagement
   },
   data() {
     return {
       tableData: {},
+      listVisible:false,
       modelVisible:false,
       messageVisible:false,
       messagecontent:{},
@@ -432,7 +429,7 @@ export default {
         axios
         // here
           .post("http://175.24.53.216:8080/get_message", {//127.0.0.1:8080
-            token: String(that.$store.getters.getToken).substring(1,String(that.$store.getters.getToken).length-1),
+            token: localStorage.getItem('token'),
           })
           .then(function(response) {
             that.tableData=response.data;
