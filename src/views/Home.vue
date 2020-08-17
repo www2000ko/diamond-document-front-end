@@ -126,9 +126,15 @@
           title="提示"
           :visible.sync="modelVisible"
           width="30%">
-          <div v-for="item in allforms" :key="item.id" @click="changemodelid(item.id)">
-              {{item.title}}
-          </div>
+          <el-carousel :interval="6000" type="card" height="130px">
+            <el-carousel-item v-for="item in allforms" :key="item.id" @click.native="changemodelid(item.id)">
+              <div style="text-align:center;">
+                <template-icon :iconKind="item.id" />
+                <span>{{item.title}}<i class="el-icon-circle-check" v-if="modelid-item.id==0" style="color:green;"></i></span>
+              </div>
+            </el-carousel-item>
+          </el-carousel>
+
           <span slot="footer" class="dialog-footer">
             <el-button @click="modelVisible = false,changemodelid(0)">取 消</el-button>
             <el-button type="primary" @click="usethismodel()" :disabled="this.modelid===0?true:false">确 定</el-button>
@@ -385,11 +391,13 @@ import global from "@/components/global.vue";
 import axios from "axios";
 import jwt_decode from 'jwt-decode';
 import TeamManagement from "@/components/TeamManagement.vue";
+import TemplateIcon from "@/components/TemplateIcon.vue"
 export default {
   name: "Home",
   components: {
     Navigator,
-    TeamManagement
+    TeamManagement,
+    TemplateIcon
   },
   data() {
     return {
