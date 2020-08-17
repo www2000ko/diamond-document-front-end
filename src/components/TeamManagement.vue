@@ -1,9 +1,15 @@
 <template>
     <el-dialog title="团队成员" :visible.sync="listVisible" width="30%" show-close="false">
       <div v-for="item in allMembers" :key="item.id">
-          {{item.member_name}}
-          <el-button v-if="item.member_id!=uid" @click="dismiss(item.member_id)">移 除</el-button>
+        <div v-if="item.member_id==create_user">{{item.member_name}}
           <el-divider></el-divider>
+        </div>
+      </div>
+      <div v-for="item in allMembers" :key="item.id">
+          <div v-if="item.member_id!=create_user">{{item.member_name}}
+            <el-button v-if="item.member_id!=uid" @click="dismiss(item.member_id)" style="margin-left:45%">移 除</el-button>
+            <el-divider></el-divider>
+          </div>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="onCancel()">关 闭</el-button>
@@ -24,13 +30,17 @@ export default {
     },
     mounted(){
         this.$nextTick(()=>{
-            this.email=global.email
+            this.email=global.userEmail
             this.uid=global.userid
             this.getTeamMember()
    })
         
     },
     props: {
+      create_user: {
+        type: Number,
+        default:0
+      },
       listVisible:{
         type:Boolean,
         default:false

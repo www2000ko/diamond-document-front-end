@@ -40,9 +40,9 @@
             <span slot="title" >加入团队</span>
           </el-menu-item>
           <el-menu-item  v-for="item in allteams" :key="item.id">
-            <i :v-if="item.create_user==userid" class="el-icon-s-tools"  @click="openList(item.id)"></i>
-            <i :v-if="item.create_user!=userid" class="el-icon-tools"></i>
-              <span slot="title" @click="toTeamSpace(item.id)">{{item.name}}</span>
+            <i :v-if="item.create_user_id==userid" class="el-icon-s-tools"  @click="openList(item.id,item.create_user_id)"></i>
+            <i :v-if="item.create_user_id!=userid" class="el-icon-tools"></i>
+            <span slot="title" @click="toTeamSpace(item.id)">{{item.name}}</span>
           </el-menu-item>
         </el-menu-item-group>
       </el-submenu>
@@ -184,7 +184,6 @@
 
 
 
-
             <span slot="footer" class="dialog-footer">
               <el-button type="primary" @click="agree()" v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==0)">同 意</el-button>
               <el-button @click="disagree()" v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==0)">拒 绝</el-button>
@@ -280,7 +279,7 @@
         </div>
       </div>
     </div>
-    <TeamManagement :listVisible="listVisible" :team_id="teamid" v-on:TeamManagementCancel="listVisible=false"></TeamManagement>
+    <TeamManagement :listVisible="listVisible" :team_id="teamid" :create_user="create_user" v-on:TeamManagementCancel="listVisible=false"></TeamManagement>
   </div>
 </template>
 
@@ -308,6 +307,7 @@ export default {
       modelid:0,
       teamid:0,
       userid:0,
+      create_user:0,
       recycleflag:false,
       infoVisible:false,
       email:"临时邮箱",
@@ -362,9 +362,10 @@ export default {
     }
   },
   methods: {
-    openList(id)
+    openList(id,create_user)
     {
       this.teamid=id;
+      this.create_user=create_user;
       this.listVisible = true;
     },
     disagree()
