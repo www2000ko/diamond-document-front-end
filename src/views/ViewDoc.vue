@@ -45,14 +45,17 @@
   :visible.sync="drawer"
   :direction="direction">
   <div v-for="item in commentlist" :key="item.id" style="margin-top: 15px;">
-	  {{item.comment_user}}
-	  {{item.content}}
-	  {{item.comment_time}}
+  	<el-divider content-position="left"><span style="font-weight:bold;">{{item.comment_user}}</span></el-divider>
+    <p style="text-indent:2em;padding:0px 10px 0px 10px;"><span>{{item.content}}</span></p>
+    <div style="text-align:right;margin-right:20px;"><i class="el-icon-time"></i>
+	<span style="color:gray;">{{item.comment_time}}</span></div>  
+	  
+	  
 
-  </div>
-  <div style="margin-top: 15px;">
-  <el-input placeholder="请输入评论" v-model="comment" :disabled="!canC">
-    <el-button slot="append" icon="el-icon-s-promotion" @click="addcomment()" :disabled="!canC"></el-button>
+  </div><el-divider></el-divider>
+  <div style="margin:15px 30px 0px 30px;">
+  <el-input placeholder="请输入评论" v-model="comment">
+    <el-button slot="append" icon="el-icon-s-promotion" @click="addcomment()"></el-button>
   </el-input>
 </div>
 </el-drawer>
