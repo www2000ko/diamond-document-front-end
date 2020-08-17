@@ -151,9 +151,56 @@
     
 
     <!-- 第5框 -->
-    <div class="card" label-width="80px" v-if="teamflag==1">
+
+    <div v-if="teamflag==1">
       <h4 class="card-header">团队管理</h4>
-      <div >
+        <template>
+        <el-table
+          :data="allteams"
+          stripe
+          style="width: 100%">
+          <el-table-column
+            prop="name"
+            label="队伍名称"
+            width="90">
+          </el-table-column>
+          <el-table-column
+            prop="id"
+            label="队伍id"
+            width="90">
+          </el-table-column>
+          <el-table-column
+            prop="create_time"
+            label="创建日期"
+            width="150">
+          </el-table-column>
+          <el-table-column
+            prop="create_user"
+            label="创建人"
+            width="90">
+          </el-table-column>
+          <el-table-column
+            prop="number"
+            label="团队人数"
+            width="90">
+          </el-table-column>
+          <el-table-column label="操作">
+          <template slot-scope="ateam">
+            <el-button
+              size="mini"
+              type="primary"
+              v-if="ateam.row.create_user_id==uid" 
+              @click="openList(ateam.row.id)">管理</el-button>
+            <el-button
+              size="mini"
+              type="danger"
+              v-if="ateam.row.create_user_id!=uid"
+              @click="quitTeam(ateam.row.id)">退出</el-button>
+          </template>
+        </el-table-column>
+        </el-table>
+      </template>
+      <!-- <div >
         <div v-for="item in allteams" :key="item.id">
           <h5>{{item.name}}</h5>
           id：{{item.id}}
@@ -164,13 +211,14 @@
           <el-button v-if="item.create_user_id!=uid" @click="quitTeam(item.id)">退 出</el-button>
           <el-divider></el-divider>
         </div>
-      </div>
+      </div> -->
+          <!-- 团队人员管理 -->
     </div>
-<!-- 团队人员管理 -->
     <TeamManagement :listVisible="listVisible" :team_id="team_id" v-on:TeamManagementCancel="TeamManagementCancel"></TeamManagement>
 
     </el-main>
     </el-container>
+  
   </div>
 </template>
 
@@ -231,7 +279,7 @@ export default {
       team_id:0,
       passwd1:"",
       passwd2:"",
-      allteams:"",
+      allteams:{},
       allMembers:"",
       location:'',
       phonenumber:'',
@@ -255,6 +303,7 @@ export default {
   },
   methods: {
     TeamManagementCancel(){
+      this.myteam()
       this.listVisible=false;
     },
     dismiss(member_id){
@@ -272,25 +321,6 @@ export default {
               type: 'success'
             });
             that.getTeamMember(that.team_id)
-        })
-        .catch(function(error) {
-          alert(error);
-        });
-    },
-    eliminate(team_id){
-      var that = this;
-      axios
-        .post("http://175.24.53.216:8080/eliminate", {
-          email: that.email,
-          id:team_id,
-        })
-        .then(function(response) {
-          console.log(response.data.msg);
-          that.$message({
-              message: '解散成功',
-              type: 'success'
-            });
-            that.myteam()
         })
         .catch(function(error) {
           alert(error);
@@ -330,7 +360,7 @@ export default {
           })
           .then(function(response) {
             that.allteams=response.data;
-            console.log(that.allteams);
+            //alert(that.allteams);
           })
           .catch(function(error) {
             alert(error);
@@ -399,7 +429,7 @@ export default {
           })
           .then(function(res) {
             alert("修改成功！");
-            that.$store.commit('setToken',JSON.stringify(res.data.token));
+            that.$store.commit('setToken',res.data.token);
           })
           .catch(function(error) {
             alert(error);

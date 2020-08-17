@@ -29,13 +29,13 @@
           <span>团队空间</span>
         </template>
         <el-menu-item-group>
-          <el-menu-item @click="toggleModalCreate">
+          <el-menu-item @click="createteamVisible=true">
             <template slot="title" >
               <i class="el-icon-plus"></i>
               <span slot="title" >新建团队</span>
             </template>
           </el-menu-item>
-          <el-menu-item @click="toggleModalJoin">
+          <el-menu-item @click="jointeamVisible=true">
             <i class="el-icon-zoom-in"></i>
             <span slot="title" >加入团队</span>
           </el-menu-item>
@@ -65,7 +65,7 @@
         </el-menu>
         </el-row>
         <!-- 下方内容 -->
-            <div class="files" v-for="item in allfiles" :key="item.id" >
+            <!-- <div class="files" v-for="item in allfiles" :key="item.id" >
               <div class="box">
                 <div @click="tothisdoc(item.doc_id)">{{item.title}}</div>
                 创建时间:{{item.create_time}}
@@ -73,7 +73,30 @@
                 上次修改时间:{{item.modify_time}}
                 <div @click="openinfo(item.create_user_email)">创建人:{{item.create_user}}</div>
               </div>
+            </div> -->
+
+
+  <div class="files" v-for="item in allfiles" :key="item.id" >
+                <el-popover
+                  placement="left-start"
+                  title="属性"
+                  width="200"
+                  trigger="hover">
+                  <div @click="tothisdoc(item.doc_id)">{{item.title}}</div>
+                    创建时间:{{item.create_time}}
+                  <div @click="openinfo(item.modify_user_email)">上次修改者:{{item.modify_user}}</div>
+                    上次修改:{{item.modify_time}}
+                  <div @click="openinfo(item.create_user_email)">创建人:{{item.create_user}}</div>
+                  <el-button size="mini" type="text" :disabled="item.create_user_id!=userid">删除</el-button>
+                  <el-button type="text" size="mini" >权限管理</el-button>
+
+                  <el-button @click="tothisdoc(item.doc_id)" slot="reference"><i style="font-size: 150px;" class="el-icon-document"></i><p></p>{{item.title}}</el-button>
+                  
+                </el-popover>
            </div>
+
+
+
 <!-- 信息弹窗 -->
           <el-dialog
             title="用户信息"
@@ -82,18 +105,18 @@
             <el-row class="InfoDialog">
             <el-col class="sidebar-avatar"><el-avatar :src="userinfo.avatar" :size="100"></el-avatar></el-col>
             <el-col class="sidebar-name">{{userinfo.name}}</el-col>
-            <el-col class="prototype" :span="6">邮箱</el-col>
+            <el-col class="prototype" :span="10">邮箱</el-col>
             <el-tooltip class="email-detail" effect="dark" :content="userinfo.email" placement="top-start">
-            <el-col class="value" :span="18">{{userinfo.email}}</el-col></el-tooltip>
-            <el-col class="prototype" :span="6">性别</el-col>
-            <el-col class="value" :span="18" v-if="userinfo.gender==1">男</el-col>
-            <el-col class="value" :span="18" v-else>女</el-col>
-            <el-col class="prototype" :span="6">联系电话</el-col>
-            <el-col class="value" :span="18">{{userinfo.phone}}</el-col>
-            <el-col class="prototype" :span="6">生日</el-col>
-            <el-col class="value" :span="18">{{userinfo.birthday}}</el-col>
-            <el-col class="prototype" :span="6">地址</el-col>
-            <el-col class="value" :span="18">{{userinfo.address}}</el-col>
+            <el-col class="value" :span="14">{{userinfo.email}}</el-col></el-tooltip>
+            <el-col class="prototype" :span="10">性别</el-col>
+            <el-col class="value" :span="14" v-if="userinfo.gender==1">男</el-col>
+            <el-col class="value" :span="14" v-else>女</el-col>
+            <el-col class="prototype" :span="10">联系电话</el-col>
+            <el-col class="value" :span="14">{{userinfo.phone}}</el-col>
+            <el-col class="prototype" :span="10">生日</el-col>
+            <el-col class="value" :span="14">{{userinfo.birthday}}</el-col>
+            <el-col class="prototype" :span="10">地址</el-col>
+            <el-col class="value" :span="14">{{userinfo.address}}</el-col>
             </el-row>
           </el-dialog>
       </div>
@@ -185,10 +208,10 @@
 
 
             <span slot="footer" class="dialog-footer">
-              <el-button type="primary" @click="agree()" v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==0)">同 意</el-button>
+              <el-button type="primary" @click="agree(messagecontent.type,messagecontent.sender_id,messagecontent.team_id)" v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==0)">同 意</el-button>
               <el-button @click="disagree()" v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==0)">拒 绝</el-button>
-              <el-button disable v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==1)">已同意</el-button>
-              <el-button disable v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==2)">已拒绝</el-button>
+              <el-button disabled disable v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==1)">已同意</el-button>
+              <el-button disabled disable v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==2)">已拒绝</el-button>
               <el-button type="primary" @click="messageVisible = false,closemessage" v-if="!((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==0)">确 定</el-button>
             </span>
           </el-dialog>
@@ -218,7 +241,7 @@
 
 
     
-
+<!-- 
       <div v-if="showCreateModal">
       <div class="modal-backdrop">
         <div class="modal">
@@ -278,8 +301,79 @@
           </div>
         </div>
       </div>
-    </div>
-    <TeamManagement :listVisible="listVisible" :team_id="teamid" :create_user="create_user" v-on:TeamManagementCancel="listVisible=false"></TeamManagement>
+    </div> -->
+
+<el-dialog
+   title="创建团队"
+   :visible.sync="createteamVisible"
+   width="40%"
+   :before-close="handleClose">
+
+             <el-form ref="createTeam_form" :model="createTeam_form" :rules="rules" label-width="80px" >
+               <el-form-item label="团队名称" prop="team_name">  
+                 <el-input
+                 placeholder="请输入团队名称"
+                 v-model="createTeam_form.team_name"
+                 ></el-input>
+               </el-form-item>
+             </el-form>
+   <span slot="footer" class="dialog-footer">
+     <el-button @click="createteamVisible = false,createTeam_form.team_name=''">取 消</el-button>
+     <el-button type="primary" @click="submitCreateForm('createTeam_form'),createteamVisible = false">确 定</el-button>
+   </span>
+ </el-dialog>
+
+
+ <el-dialog
+   title="搜索团队"
+   :visible.sync="jointeamVisible"
+   width="40%"
+   :before-close="handleClose">
+         <el-form ref="searchTeam_form" :model="searchTeam_form" :rules="rules" >
+                     <el-form-item prop="team_name">  
+                       <el-input
+                       placeholder="team name"
+                       v-model="searchTeam_form.team_name"
+                       class="input-with-select"
+                       >
+                       <el-button slot="append" icon="el-icon-search" @click="submitSearchForm('searchTeam_form')"></el-button>
+                       </el-input>
+                     </el-form-item>
+         </el-form>
+
+       <template>
+         <el-table
+           :data="searchteams"
+           stripe="true"
+           style="width: 100%">
+           <el-table-column
+             prop="team_name"
+             label="团队名"
+             width="140">
+           </el-table-column>
+           <el-table-column
+             prop="id"
+             label="团队id"
+             width="100">
+           </el-table-column>
+           <el-table-column
+             prop="create_user_name"
+             label="创建人"
+             width="140">
+           </el-table-column>
+           <el-table-column label="操作" width="140">
+             <template slot-scope="anapply">
+               <el-button
+                 size="mini"
+                 @click="applyjoin(anapply.row.id)"
+                 >申请加入</el-button>
+             </template>
+           </el-table-column>
+         </el-table>
+       </template>
+
+ </el-dialog>
+    <TeamManagement :listVisible="listVisible" :team_id="teamid" :create_user="create_user" v-on:TeamManagementCancel="TeamManagementCancel"></TeamManagement>
   </div>
 </template>
 
@@ -300,6 +394,8 @@ export default {
   data() {
     return {
       tableData: {},
+      createteamVisible:false,
+      jointeamVisible:false,
       listVisible:false,
       modelVisible:false,
       messageVisible:false,
@@ -343,8 +439,8 @@ export default {
   },
   created()
   {
-    if(this.$store.getters.getToken){
-      const decoded = jwt_decode(this.$store.getters.getToken);
+    if(localStorage.getItem('token')){
+      const decoded = jwt_decode(localStorage.getItem('token'));
       console.log(decoded);
       global.loginflag=true;
       global.userName=decoded.name;
@@ -362,6 +458,47 @@ export default {
     }
   },
   methods: {
+    TeamManagementCancel(){
+      this.listVisible=false
+      this.myteam()
+    },
+     applyjoin(id){
+         var that = this;
+         axios
+         // here
+           .post("http://175.24.53.216:8080/apply", {//127.0.0.1:8080
+           team_id:id,
+           email:that.email
+           })
+           .then(function(response) {
+             console.log(response.data);
+             if(response.data.code==200)
+             {
+               that.$message({
+               type: 'success',
+               message: '申请成功!'
+             });
+             }
+             else if(response.data.code==402)
+             {
+               that.$message({
+               type: 'warning',
+               message: '你已在队伍中!'
+             });
+             }
+             
+           })
+           .catch(function(error) {
+             alert(error);
+           });
+     },
+     handleClose(done) {
+         this.searchteams="";
+         this.searchTeam_form.team_name="";
+         this.createTeam_form.team_name="";
+         done();
+
+       },
     openList(id,create_user)
     {
       this.teamid=id;
@@ -380,7 +517,11 @@ export default {
           .then(function(response) {
             console.log(response.data);
             that.messagecontent.status=2
-          })
+            that.$message({
+                               type: 'success',
+                               message: '已拒绝申请!'
+                         })
+           })
           .catch(function(error) {
             alert(error);
           });
@@ -491,10 +632,23 @@ export default {
         this.messageVisible=true
       },
       handleDelete(index, row) {
-        alert(index);
-        alert(row);
-        alert(row.sender_name);
-      },
+         var that=this
+         axios
+           .post("http://175.24.53.216:8080/delete_message", {//127.0.0.1:8080
+             id: row.id,
+           })
+           .then(function(response) {
+             console.log(response)
+             that.$message({
+               type: 'success',
+               message: '删除成功!'
+             });
+             that.getallmessage()
+           })
+           .catch(function(error) {
+             alert(error);
+           });
+       },
     getallmessage(){
       var that = this;
         axios
@@ -648,7 +802,11 @@ export default {
       // here
         .post("http://175.24.53.216:8080/buildteam", that.createTeam_form)//175.24.53.216:8080 127.0.0.1:8080
         .then(function(response) {
-          alert(response.data.msg);
+          console.log(response.data)
+         that.$message({
+             type: 'success',
+             message: '创建成功!'
+         })
           that.myteam()
         })
         .catch(function(error) {
@@ -682,25 +840,12 @@ export default {
           }
         });
     },
-    toggleModalCreate:function(){
-      this.showCreateModal = !this.showCreateModal;
-    },
-    closemeCreate:function(){
-      this.showCreateModal = !this.showCreateModal;
-    },
-    toggleModalJoin:function(){
-      this.showJoinModal = !this.showJoinModal;
-      console.log(this.showJoinModal)
-    },
-    closemeJoin:function(){
-      this.showJoinModal = !this.showJoinModal;
-    },
     createdoc()
     {
       var that = this;
           axios
           .post("http://175.24.53.216:8080/save_new_doc", {
-            team_id: Number(that.teamid),
+            team_id: that.teamid,
             content: "",
             title: "未命名",
             email: that.email,
@@ -836,9 +981,9 @@ export default {
   }
   .prototype,.value{
     margin-bottom: 20px;
-    /* &:last-child {
-      margin-bottom: 0;
-    } */
+  }
+  .prototype{
+    text-align: center;
   }
   .value{
     color:black;
