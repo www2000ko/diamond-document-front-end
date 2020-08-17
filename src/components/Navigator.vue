@@ -7,10 +7,10 @@
     >
     <!-- background-color="#545c64" -->
       <el-menu-item index="home" @click="toHome" >
-        首页
+        <img src="../assets/703Carbink.png" style="width:60px">小碎钻文档
       </el-menu-item>
       <el-menu-item style="float:right" index="break" @click="toBreak">
-        茶歇GameBreak
+        GameBreak
       </el-menu-item>
       <el-menu-item style="float:right" index="info" @click="toInfo" v-if="loginflag==true">
         个人信息
