@@ -1,6 +1,9 @@
 <template>
 <div>
 	<Navigator return="viewdoc" />
+	<Share :dialogFormVisible="showShare" :isCreater="isWriter" 
+	:radio="share_permission" :title="title" :doc_id="docid" :input="this.$route.path"
+	@ShareConfirm="ShareConfirm" @ShareCancel="ShareCancel"/>
 	<div class="blank" style="height:20px"></div>
 	<div><el-row class="head">
 
@@ -26,12 +29,12 @@
 		</div></el-col>
 		<el-col :span="4" class="docTitleBlank" style="border:1px solid white"></el-col>
 		<el-col :span="8" style="float:right;">
-		<el-button class="button buttonRight" type="primary" @click="changewrite()" icon="el-icon-edit" circle :disabled="writeflag==1"></el-button>
-		<el-button class="button buttonRight" type="warning" icon="el-icon-star-on" v-if="likeflag==true" @click="dislike()" circle></el-button>
-		<el-button class="button buttonRight" icon="el-icon-star-off" v-if="likeflag==false" @click="addlike()" circle></el-button>
+		<el-button class="button buttonRight" type="primary" @click="changewrite()" icon="el-icon-edit" circle :disabled="writeflag==1||!canW||(isEdit&&!selfEdit)"></el-button>
+		<el-button class="button buttonRight" type="warning" icon="el-icon-star-on" v-if="likeflag==true" @click="dislike()" :disabled="writeflag==1" circle></el-button>
+		<el-button class="button buttonRight" icon="el-icon-star-off" v-if="likeflag==false" @click="addlike()" :disabled="writeflag==1" circle></el-button>
 		<el-button class="button buttonRight" type="info" icon="el-icon-chat-line-square" @click="drawer = true,getallcomment()" circle :disabled="writeflag==1"></el-button>
-		<el-button class="button buttonRight" type="warning" icon="el-icon-share" circle></el-button>
-		<el-button class="button buttonRight" type="danger" @click="recycle()" icon="el-icon-delete" circle></el-button>
+		<el-button class="button buttonRight" type="warning" icon="el-icon-share" @click="showShare=true" :disabled="writeflag==1" circle></el-button>
+		<el-button class="button buttonRight" type="danger" @click="recycle()" icon="el-icon-delete" :disabled="!isWriter" circle></el-button>
 		<el-button class="button buttonRight" type="success" @click="save()" icon="el-icon-finished" circle :disabled="writeflag==0"></el-button>
 		</el-col></el-row>
 
@@ -48,8 +51,8 @@
 
   </div>
   <div style="margin-top: 15px;">
-  <el-input placeholder="请输入评论" v-model="comment">
-    <el-button slot="append" icon="el-icon-s-promotion" @click="addcomment()"></el-button>
+  <el-input placeholder="请输入评论" v-model="comment" :disabled="!canC">
+    <el-button slot="append" icon="el-icon-s-promotion" @click="addcomment()" :disabled="!canC"></el-button>
   </el-input>
 </div>
 </el-drawer>
@@ -79,10 +82,12 @@ import axios from "axios";
 import global from "@/components/global.vue";
 import Navigator from "@/components/Navigator.vue";
 import jwt_decode from 'jwt-decode';
+import Share from '@/components/Share.vue';
 export default {
 	name:'ViewDoc',
 	props:[],
-	components:{Navigator},
+	components:{Navigator,
+				Share},
 	data(){
 	  return {
 		comment:"",
@@ -96,25 +101,41 @@ export default {
 		mdStr:"",
 		drawer: false,
 		direction: 'rtl',
-		commentlist: {}
-	  }
+		commentlist: {},
 
+		showShare:false,
+		isWriter:false,
+		canR:false,
+		canW:false,
+		canC:false,
+		create_user:0,
+		create_time:"",
+		modify_user:0,
+		modify_time:"",
+		share_permission:0,
+		isEdit:false,
+		selfEdit:false
+
+	  }
 		
 	},
-	created(){
-	  if(this.$store.getters.getToken){
-      const decoded = jwt_decode(this.$store.getters.getToken);
+	mounted(){
+	  if(localStorage.getItem('token')!=null){
+      const decoded = jwt_decode(localStorage.getItem('token'));
       console.log(decoded);
       global.loginflag=true;
       global.userName=decoded.name;
       global.userEmail=decoded.email;
       global.avatar=decoded.avatar;
       global.userid=decoded.id;
-    }
+	}
+	
 		this.writeflag = this.$route.query.kind;
 		this.docid = this.$route.query.docid;
 		this.email = global.userEmail;
 		this.getdoc();
+		this.check_edit();
+		this.get_self_permission();
 		this.getlike();
 	},
 	methods:{
@@ -215,15 +236,141 @@ export default {
 			email: that.email,
 			})
 			.then(function(response) {
-			  that.title=response.data.title
-			  that.mdStr=response.data.content
+				if(response.data.code!=200){
+					that.$alert('权限不足,即将返回首页', {
+                    confirmButtonText: '确定',
+                    type: 'warning',
+                    center: true
+                  }).then(() => {
+                    that.$router.push({ path: "/Home" });
+                  })
+				}
+			  that.canR=true;
+			  that.title=response.data.title;
+			  that.mdStr=response.data.content;
+			  that.create_user=response.data.create_user;
+			  that.create_time=response.data.create_time;
+			  that.modify_user=response.data.modify_user;
+			  that.modify_time=response.data.modify_time;
+			  if(response.teamid!=null){
+				  that.teamid=response.data.team_id;
+			  }
+			  else{
+				  that.teamid=0;
+			  }
+			  console.log(response.data.permission);
+			  that.share_permission=response.data.permission;
+			
+			  if(that.create_user==global.userid){
+				  that.isWriter=true;
+			  }
+			})
+			.catch(function(error) {
+			alert(error);
+			});
+		},
+		check_edit(){
+			var that = this;
+			axios
+			.post("http://175.24.53.216:8080/check_edit", {
+			id:Number(that.docid),
+			email: that.email,
+			})
+			.then(function(response) {
+				if(response.data.flag==2){
+					that.isEdit=true;
+					that.selfEdit=true;
+					that.$notify({
+                      title: '提示',
+                      message: '正在编辑文件，请及时保存',
+					  position: 'top-left',
+					  duration: 0
+                    });
+				}
+				else if(response.data.flag==1){
+					that.isEdit=true;
+					that.selfEdit=false;
+					that.$notify({
+                      title: '警告',
+                      message: response.data.edit_user+'正在编辑文件，无法编辑',
+					  position: 'top-left',
+					  duration: 0,
+					  type: 'warning'
+                    });
+				}
+			})
+			.catch(function(error) {
+			alert(error);
+			});
+		},
+		get_self_permission(){
+			var that = this;
+			axios
+			.post("http://175.24.53.216:8080/get_self_permission", {
+			id:Number(that.docid),
+			email: that.email,
+			})
+			.then(function(response) {
+				if(response.data.code!=200){
+					that.$message.error('获取权限失败');
+				}
+				else{
+					console.log("self permission:"+response.data.permission);
+					if((response.data.permission&0x02)!=0){
+						that.canW=true;
+					}
+					else{
+						that.canW=false;
+					}
+					if((response.data.permission&0x04)!=0){
+						that.canC=true;
+					}
+					else{
+						that.canC=false;
+					}
+					console.log("can Write:"+that.canW);
+					console.log("can Comment:"+that.canC);
+					if(that.writeflag==1&&!that.canW){
+					    that.$alert('权限不足,即将返回首页', {
+                        confirmButtonText: '确定',
+                        type: 'warning',
+                        center: true
+                      }).then(() => {
+                        that.$router.push({ path: "/Home" });
+                      })
+				    }
+					if(that.writeflag==1&&that.isEdit&&!that.selfEdit){
+					that.$alert('正在被编辑,即将进行浏览', {
+                    	confirmButtonText: '确定',
+                    	type: 'warning',
+                    	center: true
+                  	}).then(() => {
+                    	that.$router.push({
+                			name: "Viewdoc",
+                			query: { kind: 0,docid: that.docid }
+            			});
+                  	})
+					}
+				}
 			})
 			.catch(function(error) {
 			alert(error);
 			});
 		},
 		changewrite(){
-			this.writeflag=1
+			this.writeflag=1;
+			var that=this;
+			axios
+			.post("http://175.24.53.216:8080/edit_doc", {
+			id:Number(that.docid),
+			email: that.email,
+			})
+			.then(function(response) {
+			alert(response.data.msg);
+			})
+			.catch(function(error) {
+			alert(error);
+			});
 		},
 		tohome(){
 			this.$router.push({ path: "/home" });
@@ -265,7 +412,7 @@ export default {
         var that = this;
         axios
         .post("http://175.24.53.216:8080/modify_doc", {
-		  doc_id:that.docid,
+		  doc_id:Number(that.docid),
           team_id: that.teamid,
           content: that.mdStr,
           title: that.title,
@@ -273,7 +420,8 @@ export default {
         })
         .then(function(response) {
 		  that.$message(response.data.msg);
-		  that.writeflag=0
+		  that.writeflag=0;
+		  location.reload();
         })
         .catch(function(error) {
           alert(error);
@@ -287,7 +435,7 @@ export default {
         var that = this;
         axios
         .post("http://175.24.53.216:8080/modify_doc", {
-		  doc_id:that.docid,
+		  doc_id:Number(that.docid),
           team_id: that.teamid,
           content: that.mdStr,
           title: that.title,
@@ -300,7 +448,15 @@ export default {
         .catch(function(error) {
           alert(error);
         });
-      }
+	  },
+	  ShareConfirm(val){
+		this.showShare=false;
+		this.share_permission=val;
+	  },
+	  ShareCancel(){
+		  this.showShare=false;
+		  console.log(this.showShare);
+	  }
   }
 }
 </script>
@@ -316,7 +472,6 @@ export default {
  .docTitle{
 	 margin: 5px;
 	 margin-left: 20px;
-
 	 text-align:center;
  }
  .title{

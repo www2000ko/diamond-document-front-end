@@ -87,8 +87,8 @@ export default {
         }
     },
     created(){
-      if(this.$store.getters.getToken){
-      const decoded = jwt_decode(this.$store.getters.getToken);
+      if(localStorage.getItem('token')){
+      const decoded = jwt_decode(localStorage.getItem('token'));
       console.log(decoded);
       global.loginflag=true;
       global.userName=decoded.name;

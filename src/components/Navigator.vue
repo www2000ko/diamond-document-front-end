@@ -66,7 +66,7 @@ export default {
       global.loginflag=false;
       global.userEmail="";
       localStorage.clear();
-      location. reload();
+      location.reload();
       this.toLogin();
     }
   }

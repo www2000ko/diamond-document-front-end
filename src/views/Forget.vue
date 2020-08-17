@@ -38,8 +38,8 @@ export default {
     Navigator
   },
   created() {
-    if(this.$store.getters.getToken){
-      const decoded = jwt_decode(this.$store.getters.getToken);
+    if(localStorage.getItem('token')){
+      const decoded = jwt_decode(localStorage.getItem('token'));
       console.log(decoded);
       global.loginflag=true;
       global.userName=decoded.name;
@@ -80,7 +80,7 @@ export default {
     forgetpassword() {
       var that = this;
       axios
-        .post("http://127.0.0.1:8080/forgetpassword", {
+        .post("http://175.24.53.216:8080/forgetpassword", {
           email: that.rep_form.email
         })
         .then(function(response) {
@@ -96,7 +96,7 @@ export default {
       var that=this;
       that.code=Math.floor(Math.random() * (999999 - 100000) + 100000);
       axios
-        .post("http://127.0.0.1:8080/verification", {
+        .post("http://175.24.53.216:8080/verification", {
           type: 2,
           email: that.rep_form.email,
           code:that.code

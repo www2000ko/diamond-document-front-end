@@ -1,11 +1,11 @@
 <template>
-  <el-dialog title="分享" :visible.sync="dialogFormVisible" :center="false" :show-close="false">
+  <el-dialog title="分享" :visible.sync="dialogFormVisible" :center="false" :show-close="false" :close-on-click-modal="false" @opened="opened()">
     <div slot="title">
       分享
     <el-divider></el-divider>
     <div class="file">
         <label v-text="title"></label>
-      <el-button @click="share_func" style="margin-left:78%;">{{this.text}}</el-button>
+      <el-button @click="share_func" style="margin-left:78%;" :disabled="!isCreater">{{this.text}}</el-button>
     </div>
     <el-form :model="form" v-show="isShare" class="form">
       <el-form-item label="链接:" :label-width="formLabelWidth">
@@ -17,7 +17,7 @@
 		      <div  id="qrcode" ref="qrcode" style="float:right">
           </div>
           <el-form-item label="权 限:" :label-width="formLabelWidth" >
-            <el-radio-group v-model="radio" :disabled="isCreater">
+            <el-radio-group v-model="select" :disabled="!isCreater">
     	        <el-radio :label="1">只读</el-radio>
     	        <el-radio :label="3">读写</el-radio>
     	        <el-radio :label="5">只读+评论</el-radio>
@@ -28,8 +28,8 @@
     </el-form>
     </div>
   <div slot="footer" class="dialog-footer">
-    <el-button type="primary" @click="onConfirm()">保 存</el-button>
-    <el-button @click="dialogFormVisible = false">取 消</el-button>
+    <el-button type="primary" @click="onConfirm" :disabled="!isCreater">保 存</el-button>
+    <el-button @click="onCancel">取 消</el-button>
   </div>
 </el-dialog>
 </template>
@@ -43,7 +43,8 @@ export default {
     data(){
       return{
         formLabelWidth:"50px",
-        isShare:false
+        isShare:false,
+        select:3
       };
     },
     mounted (){
@@ -51,9 +52,12 @@ export default {
              this.qrcode();
              if(this.radio==0){
                this.isShare=false;
+               //this.radio=3;
+               this.select=3;
              }
              else{
                this.isShare=true;
+               this.select=this.radio;
              }
              if(this.isShare){
                  this.text="关闭分享";
@@ -61,6 +65,10 @@ export default {
              else{
                this.text="开启分享";
              }
+             console.log(this.dialogFormVisible);
+             console.log(this.doc_id);
+             console.log(this.isCreater);
+             console.log(this.radio);
    })
  },
     name: 'Share',
@@ -87,7 +95,7 @@ export default {
       },
       isCreater:{
         type:Boolean,
-        default:true
+        required:true
       },
       radio:{
         type:Number,
@@ -104,7 +112,27 @@ export default {
           this.text="开启分享";
         }
       },
-      open(){
+      opened(){
+        console.log(this.radio);
+        if(this.radio==0){
+               this.isShare=false;
+               //this.radio=3;
+               this.select=3;
+             }
+             else{
+               this.isShare=true;
+               this.select=this.radio;
+             }
+             if(this.isShare){
+                 this.text="关闭分享";
+             }
+             else{
+               this.text="开启分享";
+             }
+             console.log(this.dialogFormVisible);
+             console.log(this.doc_id);
+             console.log(this.isCreater);
+             console.log(this.radio);
       },
       qrcode () {
         var canvas = this.$refs.qrcode;
@@ -126,13 +154,13 @@ export default {
         var that=this;
         var permission=0;
         if(this.isShare){
-          permission=this.radio;
+          permission=this.select;
         }
         axios
           .post("http://175.24.53.216:8080/share_doc", {//127.0.0.1:8080
           email:global.userEmail,
           permission:permission,
-          id:that.doc_id
+          doc_id:Number(that.doc_id)
           })
           .then(function(response) {
             console.log(response.data);
@@ -140,10 +168,11 @@ export default {
           .catch(function(error) {
             alert(error);
           });
-        this.$emit('ShareConfirm',this.radio);
+        this.$emit('ShareConfirm',permission);
       },
       onCancel(){
         this.$emit('ShareCancel');
+        console
       }
     }
 }
