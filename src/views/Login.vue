@@ -73,7 +73,6 @@ export default {
       axios
         .post("http://175.24.53.216:8080/login", that.login_form)
         .then(function(response) {
-          alert(response.data.msg);
           if (response.data.msg == "login success") {
             const decoded = jwt_decode(response.data.token);            
             console.log(decoded);            
@@ -83,6 +82,10 @@ export default {
             global.avatar=decoded.avater;        
             global.userEmail = decoded.email;     
             that.$store.commit('setToken',response.data.token);
+            that.$message({
+					type: 'success',
+					message: '登录成功!'
+				});
             //alert(Navigator.username );
             //this.forceUpdate();
             //this.$root.username = that.uname;
@@ -93,6 +96,10 @@ export default {
           }
           else if(response.data.msg == "login fail")
           {
+            that.$message({
+					type: 'danger',
+					message: '登录失败!'
+				});
             that.showrepassword=true;
           }
         })

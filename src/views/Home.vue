@@ -15,7 +15,7 @@
       
       <el-menu-item index="2" @click="tomessage()" :disabled="teamid!=0">
         <i class="el-icon-message"></i>
-        <span slot="title" >收件箱</span>
+        <el-badge :value="this.messagenum" class="item">收件箱</el-badge>
       </el-menu-item>
 
       <el-menu-item index="3" @click="torecycle()" :disabled="teamid!=0">
@@ -88,6 +88,7 @@
                     上次修改:{{item.modify_time}}
                   <div @click="openinfo(item.create_user_email)">创建人:{{item.create_user}}</div>
                   <el-button size="mini" type="text" :disabled="item.create_user_id!=userid">删除</el-button>
+                  <el-button type="text" size="mini" @click="toHistory(item.doc_id)">修改记录</el-button>
                   <el-button type="text" size="mini" >权限管理</el-button>
 
                   <el-button @click="tothisdoc(item.doc_id)" slot="reference"><i style="font-size: 150px;" class="el-icon-document"></i><p></p>{{item.title}}</el-button>
@@ -98,28 +99,10 @@
 
 
 <!-- 信息弹窗 -->
-          <el-dialog
-            title="用户信息"
-            :visible.sync="infoVisible"
-            width="30%">
-            <el-row class="InfoDialog">
-            <el-col class="sidebar-avatar"><el-avatar :src="userinfo.avatar" :size="100"></el-avatar></el-col>
-            <el-col class="sidebar-name">{{userinfo.name}}</el-col>
-            <el-col class="prototype" :span="10">邮箱</el-col>
-            <el-tooltip class="email-detail" effect="dark" :content="userinfo.email" placement="top-start">
-            <el-col class="value" :span="14">{{userinfo.email}}</el-col></el-tooltip>
-            <el-col class="prototype" :span="10">性别</el-col>
-            <el-col class="value" :span="14" v-if="userinfo.gender==1">男</el-col>
-            <el-col class="value" :span="14" v-else>女</el-col>
-            <el-col class="prototype" :span="10">联系电话</el-col>
-            <el-col class="value" :span="14">{{userinfo.phone}}</el-col>
-            <el-col class="prototype" :span="10">生日</el-col>
-            <el-col class="value" :span="14">{{userinfo.birthday}}</el-col>
-            <el-col class="prototype" :span="10">地址</el-col>
-            <el-col class="value" :span="14">{{userinfo.address}}</el-col>
-            </el-row>
-          </el-dialog>
-      </div>
+       <Info :infoVisible="infoVisible" :userinfo="userinfo" @closeInfo="closeInfo()"/>
+</div>
+
+<History :HistoryVisible="HistoryVisible" :doc_id="dochistory" @closeHistory="closeHistory()"/>
 <!-- 模版界面 -->
 
         <el-dialog
@@ -218,7 +201,7 @@
               <el-button @click="disagree()" v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==0)">拒 绝</el-button>
               <el-button disabled disable v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==1)">已同意</el-button>
               <el-button disabled disable v-if="((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==2)">已拒绝</el-button>
-              <el-button type="primary" @click="messageVisible = false,closemessage" v-if="!((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==0)">确 定</el-button>
+              <el-button type="primary" @click="messageVisible = false,getallmessage()" v-if="!((messagecontent.type==0||messagecontent.type==1)&&messagecontent.status==0)">确 定</el-button>
             </span>
           </el-dialog>
 
@@ -392,12 +375,16 @@ import axios from "axios";
 import jwt_decode from 'jwt-decode';
 import TeamManagement from "@/components/TeamManagement.vue";
 import TemplateIcon from "@/components/TemplateIcon.vue"
+import Info from "@/components/Info.vue"
+import History from "@/components/History.vue"
 export default {
   name: "Home",
   components: {
     Navigator,
     TeamManagement,
-    TemplateIcon
+    TemplateIcon,
+    Info,
+    History
   },
   data() {
     return {
@@ -410,8 +397,11 @@ export default {
       messagecontent:{},
       modelid:0,
       teamid:0,
+      messagenum:0,
       userid:0,
       create_user:0,
+      dochistory:0,
+      HistoryVisible:false,
       recycleflag:false,
       infoVisible:false,
       email:"临时邮箱",
@@ -461,6 +451,7 @@ export default {
     this.search()
     this.modelid=0
     this.myteam()
+    this.getallmessage()
     if(global.userid==0){
       this.$router.push({ path: "/login" });
     }
@@ -470,6 +461,8 @@ export default {
       this.listVisible=false
       this.myteam()
     },
+    closeHistory(){      this.HistoryVisible = false    },
+    toHistory(a){      this.HistoryVisible = true,    this.dochistory=a},
      applyjoin(id){
          var that = this;
          axios
@@ -666,6 +659,14 @@ export default {
           })
           .then(function(response) {
             that.tableData=response.data;
+            var tmp=0;
+            for(var i=0;i<response.data.length;i++){
+              if(response.data[i].status==0)
+              {
+                tmp++;
+              }
+            }
+            that.messagenum=tmp
           })
           .catch(function(error) {
             alert(error);
@@ -695,6 +696,9 @@ export default {
         .then(function(response) {
           //that.$set()
           that.userinfo=response.data
+          if(that.userinfo.phone==null){that.userinfo.phone="暂无"} 
+          if(that.userinfo.address==null){that.userinfo.address="暂无"}        
+          if(that.userinfo.birthday==null){that.userinfo.birthday="暂无"}
         })
         .catch(function(error) {
           alert(error);
@@ -705,6 +709,7 @@ export default {
       this.infoVisible = true,
       this.getinfo(infouseremail)
     },
+    closeInfo(){      this.infoVisible = false    },
     usethismodel()
     {
       var that = this;

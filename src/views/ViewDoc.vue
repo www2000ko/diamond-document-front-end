@@ -8,7 +8,7 @@
 	<div><el-row class="head">
 
 		<el-col :span="1">
-		<el-button class="button" type="primary" @click="tohome()" icon="el-icon-s-home" circle></el-button></el-col>
+		<el-button class="button" type="primary" @click="tohomebutton()" icon="el-icon-s-home" circle></el-button></el-col>
 
 		<el-col :span="7" class="docTitle">
 		<!--<el-input style="align: middle">未命名</el-input>-->
@@ -29,6 +29,7 @@
 		</div></el-col>
 		<el-col :span="4" class="docTitleBlank" style="border:1px solid white"></el-col>
 		<el-col :span="8" style="float:right;">
+		<el-button class="button buttonRight" type="info" @click="toHistory(docid)" icon="el-icon-s-order" circle :disabled="writeflag==1"></el-button>
 		<el-button class="button buttonRight" type="primary" @click="changewrite()" icon="el-icon-edit" circle :disabled="writeflag==1||!canW||(isEdit&&!selfEdit)"></el-button>
 		<el-button class="button buttonRight" type="warning" icon="el-icon-star-on" v-if="likeflag==true" @click="dislike()" :disabled="writeflag==1" circle></el-button>
 		<el-button class="button buttonRight" icon="el-icon-star-off" v-if="likeflag==false" @click="addlike()" :disabled="writeflag==1" circle></el-button>
@@ -39,13 +40,14 @@
 		</el-col></el-row>
 
 
+<History :HistoryVisible="HistoryVisible" :doc_id="dochistory" @closeHistory="closeHistory()"/>
 <!-- 评论页面 -->
 <el-drawer
   title="评论"
   :visible.sync="drawer"
   :direction="direction">
   <div v-for="item in commentlist" :key="item.id" style="margin-top: 15px;">
-  	<el-divider content-position="left"><span style="font-weight:bold;">{{item.comment_user}}</span></el-divider>
+  	<el-divider content-position="left"><span style="font-weight:bold;" @click="openinfo(item.comment_user_email)">{{item.comment_user}}</span></el-divider>
     <p style="text-indent:2em;padding:0px 10px 0px 10px;"><span>{{item.content}}</span></p>
     <div style="text-align:right;margin-right:20px;"><i class="el-icon-time"></i>
 	<span style="color:gray;">{{item.comment_time}}</span></div>  
@@ -60,7 +62,7 @@
 </div>
 </el-drawer>
 
-
+<Info :infoVisible="infoVisible" :userinfo="userinfo" @closeInfo="closeInfo()"/>
 
 	<div id="md" v-if="writeflag==1">
 	      <mavon-editor class="editor" ref=md @imgAdd="$imgAdd" v-model="mdStr" @save="$save"></mavon-editor>
@@ -86,11 +88,15 @@ import global from "@/components/global.vue";
 import Navigator from "@/components/Navigator.vue";
 import jwt_decode from 'jwt-decode';
 import Share from '@/components/Share.vue';
+import Info from '@/components/Info.vue';
+import History from '@/components/History.vue';
 export default {
 	name:'ViewDoc',
 	props:[],
 	components:{Navigator,
-				Share},
+				Share,
+				Info,
+				History},
 	data(){
 	  return {
 		comment:"",
@@ -105,7 +111,10 @@ export default {
 		drawer: false,
 		direction: 'rtl',
 		commentlist: {},
-
+		dochistory:0,
+		HistoryVisible:false,
+		userinfo:{},
+		infoVisible:false,
 		showShare:false,
 		isWriter:false,
 		canR:false,
@@ -140,8 +149,57 @@ export default {
 		this.check_edit();
 		this.get_self_permission();
 		this.getlike();
+		if(this.writeflag==1)
+		{
+			this.changewrite();
+			this.check_edit();
+		}
 	},
 	methods:{
+		tohomebutton()
+		{
+			if(this.selfEdit||this.writeflag==1)
+			{
+				this.$alert('确定放弃未保存内容？', {
+					confirmButtonText: '确定',
+					cancelButtonText: '取消',
+						type: 'warning'
+						}).then(() => {
+							this.tohome()
+						}).catch(() => {
+						});
+			}
+			else
+			{
+				this.tohome()
+			}
+			
+		},
+		closeHistory(){      this.HistoryVisible = false    },
+    toHistory(a){      this.HistoryVisible = true,    this.dochistory=a},
+		getinfo(byemail){
+      var that = this;
+      axios
+        .post("http://175.24.53.216:8080/getinfo", {
+          email: byemail,
+        })
+        .then(function(response) {
+          //that.$set()
+          that.userinfo=response.data
+          if(that.userinfo.phone==null){that.userinfo.phone="暂无"} 
+          if(that.userinfo.address==null){that.userinfo.address="暂无"}        
+          if(that.userinfo.birthday==null){that.userinfo.birthday="暂无"}
+        })
+        .catch(function(error) {
+          alert(error);
+        });
+    },
+    openinfo(infouseremail)
+    {
+      this.infoVisible = true,
+      this.getinfo(infouseremail)
+    },
+    closeInfo(){      this.infoVisible = false    },
 		getallcomment(){
 			var that = this;
 			axios
@@ -369,7 +427,11 @@ export default {
 			email: that.email,
 			})
 			.then(function(response) {
-			alert(response.data.msg);
+			console.log(response.data.msg);
+			that.$message({
+					type: 'success',
+					message: '正在编辑文档'
+				});
 			})
 			.catch(function(error) {
 			alert(error);
@@ -386,7 +448,11 @@ export default {
 			email: that.email,
 			})
 			.then(function(response) {
-			alert(response.data.msg);
+			console.log(response.data.msg);
+			that.$message({
+					type: 'danger',
+					message: '已删除文档!'
+				});
 			that.tohome();
 			})
 			.catch(function(error) {
@@ -422,9 +488,21 @@ export default {
           email: that.email,
         })
         .then(function(response) {
-		  that.$message(response.data.msg);
+		  console.log(response.data.msg);
+			that.$message({
+					type: 'success',
+					message: '修改已保存!'
+				});
 		  that.writeflag=0;
-		  location.reload();
+		  that.getdoc();
+		that.check_edit();
+		that.get_self_permission();
+		that.getlike();
+		if(that.writeflag==1)
+		{
+			that.changewrite();
+			that.check_edit();
+		}
         })
         .catch(function(error) {
           alert(error);
@@ -445,8 +523,21 @@ export default {
           email: that.email,
         })
         .then(function(response) {
-		  alert(response.data.msg);
+		  console.log(response.data.msg);
+			that.$message({
+					type: 'success',
+					message: '修改已保存!'
+				});
 		  that.writeflag=0
+		  that.getdoc();
+		that.check_edit();
+		that.get_self_permission();
+		that.getlike();
+		if(that.writeflag==1)
+		{
+			that.changewrite();
+			that.check_edit();
+		}
         })
         .catch(function(error) {
           alert(error);
