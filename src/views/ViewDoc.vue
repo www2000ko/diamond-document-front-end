@@ -4,7 +4,6 @@
 	<Share :dialogFormVisible="showShare" :isCreater="isWriter" 
 	:radio="share_permission" :title="title" :doc_id="docid" :input="this.$route.path"
 	@ShareConfirm="ShareConfirm" @ShareCancel="ShareCancel"/>
-	<div class="blank" style="height:20px"></div>
 	<div><el-row class="head">
 
 		<el-col :span="1">
@@ -13,7 +12,7 @@
 		<el-col :span="7" class="docTitle">
 		<!--<el-input style="align: middle">未命名</el-input>-->
 		<div v-if="writeflag==1" class="title">
-		<div v-if="titleflag==0" @click="titleflag=1" class="title">
+		<div v-if="titleflag==0" @click="titleflag=1" class="normalTitle">
 			{{title}}
 		</div>
 		<el-input
@@ -22,7 +21,7 @@
 		></el-input>
 		</div>
 
-		<div v-if="writeflag==0">
+		<div v-if="writeflag==0" class="normalTitle">
 		<div>
 			{{title}}
 		</div>
@@ -566,14 +565,12 @@ export default {
  .docTitle{
 	 margin: 5px;
 	 margin-left: 20px;
-	 text-align:center;
  }
  .title{
-	 text-align:center;
  }
  .head{
  	height:70px;
- 	margin-top:200px;
+ 	margin-top:20px;
  }
  .contianer{
     -webkit-tap-highlight-color: transparent;
@@ -587,5 +584,9 @@ export default {
     padding-right: 10px;
     max-width: 980px;
     width: 100%;
+  }
+  .normalTitle{
+	  margin-left:5px;
+	  margin-top:10px;
   }
 </style>
