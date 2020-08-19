@@ -20,7 +20,7 @@
           <el-input type="password" v-model="regist_form.passwd2"></el-input>
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="regist_form.email"></el-input>
+          <el-input :disabled="send_status" v-model="regist_form.email"></el-input>
           
         </el-form-item>
         <el-form-item>
