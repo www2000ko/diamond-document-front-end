@@ -76,7 +76,7 @@
             </div> -->
 
 
-  <div class="files" v-for="item in allfiles" :key="item.id" >
+  <div class="files" v-for="item in allfiles" :key="item.id" style="float:left">
                 <el-popover
                   placement="left-start"
                   title="属性"
@@ -448,12 +448,14 @@ export default {
     }
     this.userid=global.userid
     this.email=global.userEmail
-    this.search()
     this.modelid=0
-    this.myteam()
-    this.getallmessage()
     if(global.userid==0){
       this.$router.push({ path: "/login" });
+    }
+    else{
+      this.search()
+      this.myteam()
+      this.getallmessage()
     }
   },
   methods: {
