@@ -40,8 +40,8 @@
             <span slot="title" >加入团队</span>
           </el-menu-item>
           <el-menu-item  v-for="item in allteams" :key="item.id">
-            <i :v-if="item.create_user_id==userid" class="el-icon-s-tools"  @click="openList(item.id,item.create_user_id)"></i>
-            <i :v-if="item.create_user_id!=userid" class="el-icon-tools"></i>
+            <i v-if="item.create_user_id==userid" class="el-icon-setting"  @click="openList(item.id,item.create_user_id)"></i>
+            <i v-if="item.create_user_id!=userid" class="el-icon-s-tools" ></i>{{item.create_user_id}},{{userid}},{{item.create_user_id!=userid}}
             <span slot="title" @click="toTeamSpace(item.id)">{{item.name}}</span>
           </el-menu-item>
         </el-menu-item-group>
