@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="团队权限" :visible.sync="TPVisible" :center="true" :show-close="false" :close-on-click-modal="false" @opened="opened()">
+  <el-dialog title="团队权限" :visible.sync="TPVisible" :center="true" :show-close="false" :close-on-click-modal="false" @close="onCancel" @opened="opened()">
     <template>
             <el-table
               :data="tableData"
@@ -44,8 +44,6 @@ export default {
     },
     mounted (){
       this.$nextTick(()=>{
-             this.getinfo();
-             this.getLeader();
    })
  },
     name: 'TeamPermission',
