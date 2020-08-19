@@ -15,7 +15,7 @@
       
       <el-menu-item index="2" @click="tomessage()" :disabled="teamid!=0">
         <i class="el-icon-message"></i>
-        <el-badge :value="this.messagenum" class="item">收件箱</el-badge>
+        <el-badge :value="this.messagenum" class="item" :hidden="this.messagenum==0">收件箱</el-badge>
       </el-menu-item>
 
       <el-menu-item index="3" @click="torecycle()" :disabled="teamid!=0">
@@ -40,8 +40,8 @@
             <span slot="title" >加入团队</span>
           </el-menu-item>
           <el-menu-item  v-for="item in allteams" :key="item.id">
-            <i v-if="item.create_user_id==userid" class="el-icon-setting"  @click="openList(item.id,item.create_user_id)"></i>
-            <i v-if="item.create_user_id!=userid" class="el-icon-s-tools" ></i>
+            <i :v-if="item.create_user_id==userid" class="el-icon-s-tools"  @click="openList(item.id,item.create_user_id)"></i>
+            <i :v-if="item.create_user_id!=userid" class="el-icon-tools"></i>
             <span slot="title" @click="toTeamSpace(item.id)">{{item.name}}</span>
           </el-menu-item>
         </el-menu-item-group>
@@ -76,6 +76,7 @@
             </div> -->
 
 <div class="files" v-for="item in allfiles" :key="item.id" >
+                <TeamPermission :TPVisible="TPVisible" :doc_id="item.doc_id"  :team_id="teamid" @closeTeamPermission="closeTeamPermission" />
                 <el-popover
                   placement="left-start"
                   title="属性"
@@ -93,11 +94,11 @@
                   <el-col :span="8"><span>修改时间:</span></el-col>
                   <el-col :span="16"><span>{{item.modify_time}}</span></el-col></el-row>
                   <el-row style="text-align:center;">
-                  <el-col :span="6"><el-button size="mini" type="text" :disabled="item.create_user_id!=userid">删除</el-button></el-col>
+                  <el-col :span="6"><el-button size="mini" type="text" @click="recycle(item.doc_id)" :disabled="item.create_user_id!=userid">删除</el-button></el-col>
                   <el-col :span="9"><el-button type="text" size="mini" @click="toHistory(item.doc_id)">修改记录</el-button></el-col>
-                  <el-col :span="9"><el-button type="text" size="mini" >权限管理</el-button></el-col></el-row>
+                  <el-col :span="9"><el-button type="text" size="mini" @click="TPVisible=true" :disabled="!(teamid!=0&&pageflag==1)">权限管理</el-button></el-col></el-row>
 
-                  <div clas="files" @click="tothisdoc(item.doc_id)" slot="reference" style=""><i style="font-size: 150px;font-weight:lighter;color:gray;" class="el-icon-document"></i><p></p>{{item.title}}</div>
+                  <el-button clas="files" @click="tothisdoc(item.doc_id)" slot="reference" style=" box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);border-radius: 10px"><i style="font-size: 150px;font-weight:lighter;color:gray;" class="el-icon-document"></i><p></p>{{item.title}}</el-button>
                   
                 </el-popover>
            </div>
@@ -218,27 +219,50 @@
       </div>
       <!-- 回收站页面 -->
       <div v-if="pageflag==3">
-       <div class="files" v-for="item in alldeleted" :key="item.id">
-        <el-popover
+        
+<div class="files" v-for="item in alldeleted" :key="item.id" >
+                <el-popover
                   placement="left-start"
                   title="属性"
                   width="200"
                   trigger="hover">
                   <el-row style="font-size:12px;text-align:left;">
                   <el-col :span="8"><span>文件名:</span></el-col>
-                  <el-col :span="16"><div class="files-value">{{item.title}}</div></el-col>
+                  <el-col :span="16"><div @click="bedeleted(item.doc_id)" class="files-value">{{item.title}}</div></el-col>
                   <el-col :span="8"><div>创建人:</div></el-col>
-                  <el-col :span="16"><span class="files-value">{{item.create_user}}</span></el-col>
+                  <el-col :span="16"><span class="files-value" @click="openinfo(item.create_user_email)">{{item.create_user}}</span></el-col>
                   <el-col :span="8"><span>创建时间:</span></el-col>
                   <el-col :span="16">{{item.create_time}}</el-col>
                   <el-col :span="8"><div>上次修改者:</div></el-col>
-                  <el-col :span="16"><span class="files-value">{{item.modify_user}}</span></el-col>
+                  <el-col :span="16"><span @click="openinfo(item.modify_user_email)" class="files-value">{{item.modify_user}}</span></el-col>
                   <el-col :span="8"><span>修改时间:</span></el-col>
                   <el-col :span="16"><span>{{item.modify_time}}</span></el-col></el-row>
+                  <el-row style="text-align:center;">
+                  <el-col :span="6"><el-button size="mini" type="text" @click="opendelete(item.doc_id)">删除</el-button></el-col>
+                  <!-- <el-col :span="9"><el-button type="text" size="mini" @click="toHistory(item.doc_id)">修改记录</el-button></el-col> -->
+                  <el-col :span="6"><el-button type="text" size="mini" @click="openremove(item.doc_id)">恢复</el-button></el-col></el-row>
 
-                  <div @click="openremove(item.doc_id)" slot="reference" style=""><i style="font-size: 150px;font-weight:lighter;color:gray;" class="el-icon-document"></i><p></p>{{item.title}}</div>
+                  <el-button clas="files" @click="bedeleted(item.doc_id)" slot="reference" style=" box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);border-radius: 10px"><i style="font-size: 150px;font-weight:lighter;color:gray;" class="el-icon-document"></i><p></p>{{item.title}}</el-button>
                   
-                </el-popover></div>
+                </el-popover>
+           </div>
+
+
+
+
+
+
+       <!-- <el-row>
+            <div class="deletefiles" v-for="item in alldeleted" :key="item.id">
+            <div class="box" @click="openremove(item.doc_id)">
+              {{item.title}}
+                创建时间:{{item.create_time}}
+                上次修改人:{{item.modify_user}}
+                上次修改时间:{{item.modify_time}}
+                创建人:{{item.create_user}}
+            </div>
+           </div>
+        </el-row> -->
 
 
       </div>
@@ -393,8 +417,10 @@ import axios from "axios";
 import jwt_decode from 'jwt-decode';
 import TeamManagement from "@/components/TeamManagement.vue";
 import TemplateIcon from "@/components/TemplateIcon.vue"
+import TeamPermission from "@/components/TeamPermission.vue"
 import Info from "@/components/Info.vue"
 import History from "@/components/History.vue"
+import Encrypt from "@/components/Encrypt.js"
 export default {
   name: "Home",
   components: {
@@ -402,7 +428,8 @@ export default {
     TeamManagement,
     TemplateIcon,
     Info,
-    History
+    History,
+    TeamPermission
   },
   data() {
     return {
@@ -422,6 +449,7 @@ export default {
       HistoryVisible:false,
       recycleflag:false,
       infoVisible:false,
+      TPVisible:false,
       email:"临时邮箱",
       searchkind:1,
       pageflag:1,
@@ -477,9 +505,99 @@ export default {
     }
   },
   methods: {
+    recycle(docid){
+			this.$confirm('此操作将删除该文档, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          
+			var that = this;
+			axios
+			.post("http://175.24.53.216:8080/recycle", {
+			id:docid,
+			email: that.email,
+			})
+			.then(function(response) {
+			console.log(response.data.msg);
+			that.$message({
+					type: 'success',
+					message: '删除成功!'
+				});
+			that.changesearchkind(1);
+			})
+			.catch(function(error) {
+			alert(error);
+			});
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+			
+		},
+    bedeleted(docid)
+    {
+      this.$confirm('该文档已被删除, 请先恢复', '提示', {
+          confirmButtonText: '恢复',
+          cancelButtonText: '确定',
+          type: 'warning'
+        }).then(() => {
+          this.openremove(docid)
+          
+        }).catch(() => {
+      
+        });
+        this.changesearchkind(4)
+    },
+    opendelete(docid){
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+                var that = this;
+                        axios
+                        // here
+                          .post("http://175.24.53.216:8080/delete", {//127.0.0.1:8080
+                          id:docid,
+                          email:that.email
+                          })
+                          .then(function(response) {
+                            if(response.data.code==200)
+                            {
+                              that.$message({
+                                type: 'success',
+                                message: '删除成功!'
+                              });
+                            }
+
+                            else 
+                            {
+                              that.$message({
+                              type: 'warning',
+                              message: '删除失败!'
+                            });
+                            }
+                            that.changesearchkind(4)
+                          })
+                          .catch(function(error) {
+                            alert(error);
+                          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+    },
     TeamManagementCancel(){
       this.listVisible=false
       this.myteam()
+    },
+    closeTeamPermission(){
+      this.TPVisible=false;
     },
     closeHistory(){      this.HistoryVisible = false    },
     toHistory(a){      this.HistoryVisible = true,    this.dochistory=a},
@@ -748,7 +866,7 @@ export default {
               .then(function(response) {
                 that.$router.push({
                 name: "Viewdoc",
-                query: { kind: 1,docid: response.data.doc_id }
+                query: { kind: Encrypt.encrypt(1),docid: Encrypt.encrypt(response.data.doc_id) }
             });
               })
               .catch(function(error) {
@@ -776,10 +894,8 @@ export default {
                   email: that.email,
                 })
                 .then(function(response) {
-                  if(response.data.msg!="recover success")
-                  {
-                    alert("error")
-                  }
+                  console.log(response.data)
+                  that.changesearchkind(4)
                 })
                 .catch(function(error) {
                   alert(error);
@@ -817,7 +933,7 @@ export default {
     {
       this.$router.push({
                name:"Viewdoc",
-               query: { kind: 0,docid: docid }
+               query: { kind: Encrypt.encrypt(0),docid: Encrypt.encrypt(docid) }
         })
     },
     toTeamSpace(id){
@@ -886,7 +1002,7 @@ export default {
           .then(function(response) {
             that.$router.push({
             name: "Viewdoc",
-            query: { kind: 1,docid: response.data.doc_id }
+            query: { kind: Encrypt.encrypt(1),docid: Encrypt.encrypt(response.data.doc_id) }
         });
           })
           .catch(function(error) {
@@ -906,7 +1022,7 @@ export default {
           .then(function(response) {
             that.$router.push({
             name: "Viewdoc",
-            query: { kind: 1, docid: response.data.doc_id }
+            query: { kind: Encrypt.encrypt(1), docid: Encrypt.encrypt(response.data.doc_id) }
         });
           })
           .catch(function(error) {
@@ -1009,16 +1125,16 @@ export default {
     margin-bottom: 20px;
   }
   .files {
-    border: 1px solid #DCDFE6;
-    padding: 10px 35px 15px 35px;
+    border: 0px solid #DCDFE6;
+    padding: 10px 10px 15px 10px;
     float:left;
     margin: 10px;
     border-radius: 5px;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
-    box-shadow: 0 0 5px #909399;
+    box-shadow: 0 0 0px #909399;
     opacity: 1;
-    width:15%;
+    width:20%;
     text-align: center;
   }
   .files-value:hover {

@@ -89,6 +89,7 @@ import jwt_decode from 'jwt-decode';
 import Share from '@/components/Share.vue';
 import Info from '@/components/Info.vue';
 import History from '@/components/History.vue';
+import Encrypt from "@/components/Encrypt.js"
 export default {
 	name:'ViewDoc',
 	props:[],
@@ -131,6 +132,10 @@ export default {
 		
 	},
 	mounted(){
+		window.addEventListener('beforeunload', e => {
+	  	console.log(e);
+	  	this.cancel_edit();
+    });
 	  if(localStorage.getItem('token')!=null){
       const decoded = jwt_decode(localStorage.getItem('token'));
       console.log(decoded);
@@ -141,8 +146,8 @@ export default {
       global.userid=decoded.id;
 	}
 	
-		this.writeflag = this.$route.query.kind;
-		this.docid = this.$route.query.docid;
+		this.writeflag = Number(Encrypt.decrypt(this.$route.query.kind));
+		this.docid = Number(Encrypt.decrypt(this.$route.query.docid));
 		this.email = global.userEmail;
 		this.getdoc();
 		this.check_edit();
@@ -154,9 +159,44 @@ export default {
 			this.check_edit();
 		}
 	},
+	beforeRouteLeave (to, from , next) {
+		if(this.selfEdit||this.writeflag==1){
+			this.$confirm('确定放弃未保存内容？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+		this.cancel_edit();
+          next()
+        }).catch(() => {
+          next(false)         
+        });
+		}
+		else{
+			next()
+		}
+	},
+	destroyed() {
+		this.cancel_edit();
+	},
 	methods:{
+		cancel_edit(){
+			var that = this;
+      axios
+        .post("http://175.24.53.216:8080/cancel_edit_doc", {
+		  email: that.email,
+		  id:that.docid
+        })
+        .then(function(response) {
+			console.log(response.data.msg)
+        })
+        .catch(function(error) {
+			console.log(error)
+        });
+		},
 		tohomebutton()
 		{
+			/*
 			if(this.selfEdit||this.writeflag==1)
 			{
 				this.$alert('确定放弃未保存内容？', {
@@ -171,8 +211,8 @@ export default {
 			else
 			{
 				this.tohome()
-			}
-			
+			}*/
+			this.tohome()
 		},
 		closeHistory(){      this.HistoryVisible = false    },
     toHistory(a){      this.HistoryVisible = true,    this.dochistory=a},
@@ -440,6 +480,12 @@ export default {
 			this.$router.push({ path: "/home" });
 		},
 		recycle(){
+			this.$confirm('此操作将删除该文档, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          
 			var that = this;
 			axios
 			.post("http://175.24.53.216:8080/recycle", {
@@ -449,14 +495,21 @@ export default {
 			.then(function(response) {
 			console.log(response.data.msg);
 			that.$message({
-					type: 'danger',
-					message: '已删除文档!'
+					type: 'success',
+					message: '删除成功!'
 				});
 			that.tohome();
 			})
 			.catch(function(error) {
 			alert(error);
 			});
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+			
 		},
         $imgAdd(pos, $file){
           var that=this;
