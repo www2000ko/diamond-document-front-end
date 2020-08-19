@@ -5,7 +5,7 @@
     <el-aside class="card-aside">
     <!-- 第一框 -->
     <div style="margin-top: 15px;" class="card-one"  label-width="80px">
-      <el-avatar :src="this.image_url" :size="80" class="sidebar-avatar"></el-avatar>
+      <img v-if="image_url" :src="image_url" class="avatar">
       <h3 class="info-title">{{uname}} </h3>
     </div>
     
@@ -244,11 +244,18 @@ export default {
       global.userName=decoded.name;
       global.userEmail=decoded.email;
       global.avatar=decoded.avatar;
-      global.userid=decoded.id;
+      global.userid=decoded.id;    
     }
-    this.email = global.userEmail
-    this.uid=global.userid
-    this.myteam();
+    if(global.userid==0){
+      this.$router.push({ path: "/login" });
+    }
+    else{
+      this.email = global.userEmail
+      this.uid=global.userid
+      this.myteam();
+      this.getinfo();
+    }
+    
   },
   data() {
     var checkpassword = (rule, value, callback) => {
@@ -292,14 +299,15 @@ export default {
       uname: "临时用户",
       uid:0,
       email: "临时邮箱",
-      image_url:"临时路径",
+      image_url:"",
       listVisible:false,
+      fits: ['fill', 'contain', 'cover', 'none', 'scale-down'],
     };
   },
   mounted(){
     this.email = global.userEmail
     this.uname = global.userName
-    this.getinfo();
+    
   },
   methods: {
     TeamManagementCancel(){
@@ -497,8 +505,8 @@ export default {
   }
   .avatar {
     border: 1px solid #DCDFE6;
-    width:120px;
-    height:120px;
+    width:80px;
+    height:80px;
     border-radius: 50%;
     background-color:#CCFFCC;
   }

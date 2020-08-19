@@ -6,7 +6,7 @@
             @open="opened"
             @close="onCancel">
             <el-row class="InfoDialog">
-            <el-col class="sidebar-avatar"><el-avatar :src="userinfo.avatar" :size="100"></el-avatar></el-col>
+            <el-col class="sidebar-avatar"><img :src="userinfo.avatar" class="avatar"></el-col>
             <el-col class="sidebar-name">{{userinfo.name}}</el-col>
             <el-col class="prototype" :span="10">邮箱</el-col>
             <el-tooltip class="email-detail" effect="dark" :content="userinfo.email" placement="top-start">
@@ -73,5 +73,12 @@ export default {
   }
   .value{
     color:black;
+  }
+  .avatar {
+    border: 1px solid #DCDFE6;
+    width:100px;
+    height:100px;
+    border-radius: 50%;
+    background-color:#CCFFCC;
   }
 </style>
