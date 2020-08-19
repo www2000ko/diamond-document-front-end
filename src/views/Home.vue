@@ -218,17 +218,27 @@
       </div>
       <!-- 回收站页面 -->
       <div v-if="pageflag==3">
-       <el-row>
-            <div class="deletefiles" v-for="item in alldeleted" :key="item.id">
-            <div class="box" @click="openremove(item.doc_id)">
-              {{item.title}}
-                创建时间:{{item.create_time}}
-                上次修改人:{{item.modify_user}}
-                上次修改时间:{{item.modify_time}}
-                创建人:{{item.create_user}}
-            </div>
-           </div>
-        </el-row>
+       <div class="files" v-for="item in alldeleted" :key="item.id">
+        <el-popover
+                  placement="left-start"
+                  title="属性"
+                  width="200"
+                  trigger="hover">
+                  <el-row style="font-size:12px;text-align:left;">
+                  <el-col :span="8"><span>文件名:</span></el-col>
+                  <el-col :span="16"><div class="files-value">{{item.title}}</div></el-col>
+                  <el-col :span="8"><div>创建人:</div></el-col>
+                  <el-col :span="16"><span class="files-value">{{item.create_user}}</span></el-col>
+                  <el-col :span="8"><span>创建时间:</span></el-col>
+                  <el-col :span="16">{{item.create_time}}</el-col>
+                  <el-col :span="8"><div>上次修改者:</div></el-col>
+                  <el-col :span="16"><span class="files-value">{{item.modify_user}}</span></el-col>
+                  <el-col :span="8"><span>修改时间:</span></el-col>
+                  <el-col :span="16"><span>{{item.modify_time}}</span></el-col></el-row>
+
+                  <div @click="openremove(item.doc_id)" slot="reference" style=""><i style="font-size: 150px;font-weight:lighter;color:gray;" class="el-icon-document"></i><p></p>{{item.title}}</div>
+                  
+                </el-popover></div>
 
 
       </div>
