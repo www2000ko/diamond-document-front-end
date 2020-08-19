@@ -75,26 +75,34 @@
               </div>
             </div> -->
 
-
-  <div class="files" v-for="item in allfiles" :key="item.id" style="float:left">
+<div class="files" v-for="item in allfiles" :key="item.id" >
                 <el-popover
                   placement="left-start"
                   title="属性"
                   width="200"
                   trigger="hover">
-                  <div @click="tothisdoc(item.doc_id)">{{item.title}}</div>
-                    创建时间:{{item.create_time}}
-                  <div @click="openinfo(item.modify_user_email)">上次修改者:{{item.modify_user}}</div>
-                    上次修改:{{item.modify_time}}
-                  <div @click="openinfo(item.create_user_email)">创建人:{{item.create_user}}</div>
-                  <el-button size="mini" type="text" :disabled="item.create_user_id!=userid">删除</el-button>
-                  <el-button type="text" size="mini" @click="toHistory(item.doc_id)">修改记录</el-button>
-                  <el-button type="text" size="mini" >权限管理</el-button>
+                  <el-row style="font-size:12px;text-align:left;">
+                  <el-col :span="8"><span>文件名:</span></el-col>
+                  <el-col :span="16"><div @click="tothisdoc(item.doc_id)" class="files-value">{{item.title}}</div></el-col>
+                  <el-col :span="8"><div>创建人:</div></el-col>
+                  <el-col :span="16"><span class="files-value" @click="openinfo(item.create_user_email)">{{item.create_user}}</span></el-col>
+                  <el-col :span="8"><span>创建时间:</span></el-col>
+                  <el-col :span="16">{{item.create_time}}</el-col>
+                  <el-col :span="8"><div>上次修改者:</div></el-col>
+                  <el-col :span="16"><span @click="openinfo(item.modify_user_email)" class="files-value">{{item.modify_user}}</span></el-col>
+                  <el-col :span="8"><span>修改时间:</span></el-col>
+                  <el-col :span="16"><span>{{item.modify_time}}</span></el-col></el-row>
+                  <el-row style="text-align:center;">
+                  <el-col :span="6"><el-button size="mini" type="text" :disabled="item.create_user_id!=userid">删除</el-button></el-col>
+                  <el-col :span="9"><el-button type="text" size="mini" @click="toHistory(item.doc_id)">修改记录</el-button></el-col>
+                  <el-col :span="9"><el-button type="text" size="mini" >权限管理</el-button></el-col></el-row>
 
-                  <el-button @click="tothisdoc(item.doc_id)" slot="reference"><i style="font-size: 150px;" class="el-icon-document"></i><p></p>{{item.title}}</el-button>
+                  <div clas="files" @click="tothisdoc(item.doc_id)" slot="reference" style=""><i style="font-size: 150px;font-weight:lighter;color:gray;" class="el-icon-document"></i><p></p>{{item.title}}</div>
                   
                 </el-popover>
            </div>
+
+
 
 
 
@@ -989,6 +997,24 @@ export default {
   .sidebar-avatar,.sidebar-name{
     text-align: center;
     margin-bottom: 20px;
+  }
+  .files {
+    border: 1px solid #DCDFE6;
+    padding: 10px 35px 15px 35px;
+    float:left;
+    margin: 10px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    box-shadow: 0 0 5px #909399;
+    opacity: 1;
+    width:15%;
+    text-align: center;
+  }
+  .files-value:hover {
+    text-decoration:underline;
+    font-weight: bold;
+    cursor: pointer;
   }
   .sidebar-name{
     color:black;
