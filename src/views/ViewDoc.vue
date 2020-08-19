@@ -16,6 +16,8 @@
 			{{title}}
 		</div>
 		<el-input
+		 	maxlength="10"
+			show-word-limit
 			v-model="title"
 			v-if="titleflag==1"
 		></el-input>
@@ -34,7 +36,7 @@
 		<el-tooltip effect="dark" content="添加收藏" placement="top"><el-button class="button buttonRight" icon="el-icon-star-off" v-if="likeflag==false" @click="addlike()" :disabled="writeflag==1" circle></el-button></el-tooltip>
 		<el-tooltip effect="dark" content="评论" placement="top"><el-button class="button buttonRight" type="info" icon="el-icon-chat-line-square" @click="drawer = true,getallcomment()" circle :disabled="writeflag==1"></el-button></el-tooltip>
 		<el-tooltip effect="dark" content="分享" placement="top"><el-button class="button buttonRight" type="warning" icon="el-icon-share" @click="showShare=true" :disabled="writeflag==1" circle></el-button></el-tooltip>
-		<el-tooltip effect="dark" content="删除" placement="top"><el-button class="button buttonRight" type="danger" @click="recycle()" icon="el-icon-delete" :disabled="!isWriter" circle></el-button></el-tooltip>
+		<el-tooltip effect="dark" content="删除" placement="top"><el-button class="button buttonRight" type="danger" @click="recycle()" icon="el-icon-delete" :disabled="!isWriter||writeflag==1" circle></el-button></el-tooltip>
 		<el-tooltip effect="dark" content="保存" placement="top"><el-button class="button buttonRight" type="success" @click="save()" icon="el-icon-finished" circle :disabled="writeflag==0"></el-button></el-tooltip>
 		</el-col></el-row>
 
@@ -55,13 +57,13 @@
 
   </div><el-divider></el-divider>
   <div style="margin:15px 30px 0px 30px;">
-  <el-input placeholder="请输入评论" v-model="comment">
-    <el-button slot="append" icon="el-icon-s-promotion" @click="addcomment()"></el-button>
+  <el-input placeholder="请输入评论" v-model="comment" :disabled="!canC">
+    <el-button slot="append" icon="el-icon-s-promotion" @click="addcomment()" :disabled="!canC"></el-button>
   </el-input>
 </div>
 </el-drawer>
 
-<Info :infoVisible="infoVisible" :userinfo="userinfo" @closeInfo="closeInfo()"/>
+<Info :infoVisible="infoVisible" :userinfo="userinfo" @closeInfo="closeInfo()"/> 
 
 	<div id="md" v-if="writeflag==1">
 	      <mavon-editor class="editor" ref=md @imgAdd="$imgAdd" v-model="mdStr" @save="$save"></mavon-editor>
@@ -255,12 +257,20 @@ export default {
 			});
 		},
 		addcomment(){
+			if(this.comment=="")
+			{
+				this.$message({
+						type: 'warning',
+						message:"请输入评论内容"
+						});
+       			return 
+			}
 			var that = this;
 			axios
 			.post("http://175.24.53.216:8080/comment", {
-			id:Number(that.docid),
-			email: that.email,
-			content:that.comment
+				id:Number(that.docid),
+				email: that.email,
+				content:that.comment
 			})
 			.then(function(response) {
 				console.log(response.data.msg)
@@ -354,7 +364,7 @@ export default {
 			  that.create_time=response.data.create_time;
 			  that.modify_user=response.data.modify_user;
 			  that.modify_time=response.data.modify_time;
-			  if(response.teamid!=null){
+			  if(response.data.team_id!=null){
 				  that.teamid=response.data.team_id;
 			  }
 			  else{

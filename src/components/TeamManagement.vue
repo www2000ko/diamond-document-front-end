@@ -1,4 +1,5 @@
 <template>
+  <div>
     <el-dialog title="团队成员" :visible.sync="listVisible" width="30%" show-close="false" :before-close="handleClose">
 
       
@@ -6,12 +7,21 @@
           <el-table
             :data="leader"
             stripe
-            style="width: 100%">
+            style="width: 100%"
+            :before-close="handleClose">>
             
-              <el-table-column label="队长"  width="390">
+              <el-table-column label="队长"  width="280">
                
               <template slot-scope="scope">
                 <span>{{scope.row.create_user}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作">
+              <template>
+                <el-button 
+                size="mini"
+                type="primary"
+                @click="inviteVisibletrue">邀请</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -41,17 +51,24 @@
         <el-button @click="eliminate(team_id)">解散团队</el-button>
       </span>
     </el-dialog>
+    <Invite :inviteVisible="inviteVisible" :team_id="team_id" @InviteClose="InviteClose"></Invite>
+    </div>
 </template>
 
 <script>
 import global from "@/components/global.vue";
 import axios from "axios";
+import Invite from "@/components/Invite.vue";
 export default {
     name: 'TeamManagement',
+    components: {
+      Invite,
+    },
     data(){
       return{
         leader:{},
         allMembers:{},
+        inviteVisible:false,
       };
     },
     mounted(){
@@ -93,6 +110,12 @@ export default {
         }
     },
     methods: {
+      inviteVisibletrue(){
+        this.inviteVisible=true
+      },
+      InviteClose(){
+        this.inviteVisible=false
+      },
       eliminate(team_id){
       var that = this;
       axios
@@ -114,6 +137,8 @@ export default {
         });
     },
       handleClose(done) {
+        this.inviteVisible=false
+        this.allMembers={};
         this.$emit('TeamManagementCancel');
         done()
       },

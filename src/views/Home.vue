@@ -13,12 +13,12 @@
         <span slot="title" >工作台</span>
       </el-menu-item>
       
-      <el-menu-item index="2" @click="tomessage()" :disabled="teamid!=0">
+      <el-menu-item index="2" @click="tomessage()">
         <i class="el-icon-message"></i>
         <el-badge :value="this.messagenum" class="item" :hidden="this.messagenum==0">收件箱</el-badge>
       </el-menu-item>
 
-      <el-menu-item index="3" @click="torecycle()" :disabled="teamid!=0">
+      <el-menu-item index="3" @click="torecycle()">
         <i class="el-icon-delete"></i>
         <span slot="title" >回收站</span>
       </el-menu-item>
@@ -196,9 +196,9 @@
             <span v-if="messagecontent.type==0"> {{messagecontent.sender_name}}邀请你加入团队"{{messagecontent.team_name}}"</span>
             <span v-if="messagecontent.type==1"> {{messagecontent.sender_name}}申请加入你的团队"{{messagecontent.team_name}}"</span>
             <span v-if="messagecontent.type==2"> {{messagecontent.sender_name}}退出了你的团队"{{messagecontent.team_name}}"</span>
-            <span v-if="messagecontent.type==3"> {{messagecontent.sender_name}}修改了你的团队"{{messagecontent.team_name}}"中的文档《{{messagecontent.doc_name}}》</span>
+            <span v-if="messagecontent.type==3"> {{messagecontent.sender_name}}修改了团队"{{messagecontent.team_name}}"中的文档《{{messagecontent.doc_name}}》</span>
             <span v-if="messagecontent.type==4"> {{messagecontent.sender_name}}修改了你的个人文档《{{messagecontent.doc_name}}》</span>
-            <span v-if="messagecontent.type==5"> {{messagecontent.sender_name}}评论了你的团队"{{messagecontent.team_name}}"中的文档《{{messagecontent.doc_name}}》</span>
+            <span v-if="messagecontent.type==5"> {{messagecontent.sender_name}}评论了团队"{{messagecontent.team_name}}"中的文档《{{messagecontent.doc_name}}》</span>
             <span v-if="messagecontent.type==6"> {{messagecontent.sender_name}}评论了你的个人文档《{{messagecontent.doc_name}}》</span>
             <span v-if="messagecontent.type==7"> {{messagecontent.sender_name}}将你移出了团队"{{messagecontent.team_name}}"</span>
             <span v-if="messagecontent.type==8"> {{messagecontent.sender_name}}接受了加入团队"{{messagecontent.team_name}}"的邀请</span>
@@ -974,7 +974,6 @@ export default {
       this.$refs[formName].validate((valid) => {
       if (valid) {
       var that = this;
-      that.createTeam_form.email=global.userEmail;
       axios
       // here
         .post("http://175.24.53.216:8080/searchTeam", that.searchTeam_form)//175.24.53.216:8080 127.0.0.1:8080
