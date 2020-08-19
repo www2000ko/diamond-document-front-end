@@ -2,7 +2,7 @@
 <div>
 	<Navigator return="viewdoc" />
 	<Share :dialogFormVisible="showShare" :isCreater="isWriter" 
-	:radio="share_permission" :title="title" :doc_id="docid" :input="this.$route.path"
+	:radio="share_permission" :title="title" :doc_id="docid" :input="sharelink"
 	@ShareConfirm="ShareConfirm" @ShareCancel="ShareCancel"/>
 	<div><el-row class="head">
 
@@ -28,14 +28,14 @@
 		</div></el-col>
 		<el-col :span="4" class="docTitleBlank" style="border:1px solid white"></el-col>
 		<el-col :span="8" style="float:right;">
-		<el-button class="button buttonRight" type="info" @click="toHistory(docid)" icon="el-icon-s-order" circle :disabled="writeflag==1"></el-button>
-		<el-button class="button buttonRight" type="primary" @click="changewrite()" icon="el-icon-edit" circle :disabled="writeflag==1||!canW||(isEdit&&!selfEdit)"></el-button>
-		<el-button class="button buttonRight" type="warning" icon="el-icon-star-on" v-if="likeflag==true" @click="dislike()" :disabled="writeflag==1" circle></el-button>
-		<el-button class="button buttonRight" icon="el-icon-star-off" v-if="likeflag==false" @click="addlike()" :disabled="writeflag==1" circle></el-button>
-		<el-button class="button buttonRight" type="info" icon="el-icon-chat-line-square" @click="drawer = true,getallcomment()" circle :disabled="writeflag==1"></el-button>
-		<el-button class="button buttonRight" type="warning" icon="el-icon-share" @click="showShare=true" :disabled="writeflag==1" circle></el-button>
-		<el-button class="button buttonRight" type="danger" @click="recycle()" icon="el-icon-delete" :disabled="!isWriter" circle></el-button>
-		<el-button class="button buttonRight" type="success" @click="save()" icon="el-icon-finished" circle :disabled="writeflag==0"></el-button>
+		<el-tooltip effect="dark" content="修改记录" placement="top"><el-button class="button buttonRight" type="info" @click="toHistory(docid)" icon="el-icon-s-order" circle :disabled="writeflag==1"></el-button></el-tooltip>
+		<el-tooltip effect="dark" content="编辑" placement="top"><el-button class="button buttonRight" type="primary" @click="changewrite()" icon="el-icon-edit" circle :disabled="writeflag==1||!canW||(isEdit&&!selfEdit)"></el-button></el-tooltip>
+		<el-tooltip effect="dark" content="取消收藏" placement="top"><el-button class="button buttonRight" type="warning" icon="el-icon-star-on" v-if="likeflag==true" @click="dislike()" :disabled="writeflag==1" circle></el-button></el-tooltip>
+		<el-tooltip effect="dark" content="添加收藏" placement="top"><el-button class="button buttonRight" icon="el-icon-star-off" v-if="likeflag==false" @click="addlike()" :disabled="writeflag==1" circle></el-button></el-tooltip>
+		<el-tooltip effect="dark" content="评论" placement="top"><el-button class="button buttonRight" type="info" icon="el-icon-chat-line-square" @click="drawer = true,getallcomment()" circle :disabled="writeflag==1"></el-button></el-tooltip>
+		<el-tooltip effect="dark" content="分享" placement="top"><el-button class="button buttonRight" type="warning" icon="el-icon-share" @click="showShare=true" :disabled="writeflag==1" circle></el-button></el-tooltip>
+		<el-tooltip effect="dark" content="删除" placement="top"><el-button class="button buttonRight" type="danger" @click="recycle()" icon="el-icon-delete" :disabled="!isWriter" circle></el-button></el-tooltip>
+		<el-tooltip effect="dark" content="保存" placement="top"><el-button class="button buttonRight" type="success" @click="save()" icon="el-icon-finished" circle :disabled="writeflag==0"></el-button></el-tooltip>
 		</el-col></el-row>
 
 
@@ -126,7 +126,8 @@ export default {
 		modify_time:"",
 		share_permission:0,
 		isEdit:false,
-		selfEdit:false
+		selfEdit:false,
+		sharelink:""
 
 	  }
 		
@@ -148,6 +149,7 @@ export default {
 	
 		this.writeflag = Number(Encrypt.decrypt(this.$route.query.kind));
 		this.docid = Number(Encrypt.decrypt(this.$route.query.docid));
+		this.sharelink="175.24.53.216/#/viewdoc?kind="+Encrypt.encrypt(0)+"&docid="+this.$route.query.docid;
 		this.email = global.userEmail;
 		this.getdoc();
 		this.check_edit();

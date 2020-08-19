@@ -78,10 +78,11 @@
 <div class="files" v-for="item in allfiles" :key="item.id" >
                 <TeamPermission :TPVisible="TPVisible" :doc_id="item.doc_id"  :team_id="teamid" @closeTeamPermission="closeTeamPermission" />
                 <el-popover
-                  placement="left-start"
+                  placement="right-start"
                   title="属性"
                   width="200"
-                  trigger="hover">
+                  trigger="hover"
+                  open-delay="800">
                   <el-row style="font-size:12px;text-align:left;">
                   <el-col :span="8"><span>文件名:</span></el-col>
                   <el-col :span="16"><div @click="tothisdoc(item.doc_id)" class="files-value">{{item.title}}</div></el-col>
@@ -222,10 +223,11 @@
         
 <div class="files" v-for="item in alldeleted" :key="item.id" >
                 <el-popover
-                  placement="left-start"
+                  placement="right-start"
                   title="属性"
                   width="200"
-                  trigger="hover">
+                  trigger="hover"
+                  open-delay="800">
                   <el-row style="font-size:12px;text-align:left;">
                   <el-col :span="8"><span>文件名:</span></el-col>
                   <el-col :span="16"><div @click="bedeleted(item.doc_id)" class="files-value">{{item.title}}</div></el-col>
