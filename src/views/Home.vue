@@ -99,7 +99,7 @@
                   <el-col :span="9"><el-button type="text" size="mini" @click="toHistory(item.doc_id)">修改记录</el-button></el-col>
                   <el-col :span="9"><el-button type="text" size="mini" @click="TPVisible=true" :disabled="!(teamid!=0&&pageflag==1)">权限管理</el-button></el-col></el-row>
 
-                  <el-button clas="files" @click="tothisdoc(item.doc_id)" slot="reference" style=" box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);border-radius: 10px"><i style="font-size: 150px;font-weight:lighter;color:gray;" class="el-icon-document"></i><p></p>{{item.title}}</el-button>
+                  <el-button clas="files" @click="tothisdoc(item.doc_id)" slot="reference" style=" box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);border-radius: 10px"><i style="font-size: 150px;font-weight:lighter;color:gray;" class="el-icon-document"></i><p></p>{{item.title| ellipsis}}</el-button>
                   
                 </el-popover>
            </div>
@@ -244,7 +244,7 @@
                   <!-- <el-col :span="9"><el-button type="text" size="mini" @click="toHistory(item.doc_id)">修改记录</el-button></el-col> -->
                   <el-col :span="6"><el-button type="text" size="mini" @click="openremove(item.doc_id)">恢复</el-button></el-col></el-row>
 
-                  <el-button clas="files" @click="bedeleted(item.doc_id)" slot="reference" style=" box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);border-radius: 10px"><i style="font-size: 150px;font-weight:lighter;color:gray;" class="el-icon-document"></i><p></p>{{item.title}}</el-button>
+                  <el-button clas="files" @click="bedeleted(item.doc_id)" slot="reference" style=" box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);border-radius: 10px"><i style="font-size: 150px;font-weight:lighter;color:gray;" class="el-icon-document"></i><p></p>{{item.title| ellipsis}}</el-button>
                   
                 </el-popover>
            </div>
@@ -504,6 +504,16 @@ export default {
       this.search()
       this.myteam()
       this.getallmessage()
+    }
+  },
+  filters: {
+    // 当标题字数超出时，超出部分显示’...‘。此处限制超出8位即触发隐藏效果
+    ellipsis (value) {
+        if (!value) return ''
+        if (value.length > 8) {
+            return value.slice(0, 8) + '...'
+        }
+        return value
     }
   },
   methods: {
@@ -1135,7 +1145,8 @@ export default {
     -moz-border-radius: 5px;
     box-shadow: 0 0 0px #909399;
     opacity: 1;
-    width:20%;
+    width:170px;
+    height:200px;
     text-align: center;
   }
   .files-value:hover {
