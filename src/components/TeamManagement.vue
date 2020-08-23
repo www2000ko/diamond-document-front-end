@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog title="团队成员" :visible.sync="listVisible" width="30%" show-close="false" :before-close="handleClose">
+    <el-dialog title="团队成员" :visible.sync="listVisible" width="30%" show-close="false" @open="open()"  :before-close="handleClose">
 
       
         <template>
@@ -41,14 +41,14 @@
                   <el-button
                     size="mini"
                     type="primary"
-                    @click="dismiss(scope.row.member_id)">移除</el-button>
+                    @click="dismiss_confirm(scope.row.member_id)">移除</el-button>
                 </template>
               </el-table-column>
            
           </el-table>
         </template>     
       <span slot="footer" class="dialog-footer">
-        <el-button @click="eliminate(team_id)">解散团队</el-button>
+        <el-button @click="eliminate_confirm(team_id)">解散团队</el-button>
       </span>
     </el-dialog>
     <Invite :inviteVisible="inviteVisible" :team_id="team_id" @InviteClose="InviteClose"></Invite>
@@ -75,7 +75,6 @@ export default {
         this.$nextTick(()=>{
             this.email=global.userEmail
             this.uid=global.userid
-            this.getTeamMemberWithoutLeader()
    })
         
     },
@@ -110,11 +109,28 @@ export default {
         }
     },
     methods: {
+      open(){
+          this.getTeamMemberWithoutLeader()
+      },
       inviteVisibletrue(){
         this.inviteVisible=true
       },
       InviteClose(){
         this.inviteVisible=false
+      },
+      eliminate_confirm(team_id){
+        this.$confirm('此操作将永久解散团队, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.eliminate(team_id)
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消解散'
+          });          
+        });
       },
       eliminate(team_id){
       var that = this;
@@ -155,6 +171,20 @@ export default {
             .catch(function(error) {
               alert(error);
             });
+        },
+        dismiss_confirm(member_id){
+          this.$confirm('此操作将移除该用户, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.dismiss(member_id)
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消移除'
+          });          
+        });
         },
       dismiss(member_id){
       var that = this;

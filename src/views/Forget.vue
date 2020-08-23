@@ -97,9 +97,9 @@ export default {
       that.code=Math.floor(Math.random() * (999999 - 100000) + 100000);
       axios
         .post("http://175.24.53.216:8080/verification", {
-          type: 2,
+          type: "2",
           email: that.rep_form.email,
-          code:that.code
+          code:String(that.code)
         })
         .then(function(response) {
           if (response.data.msg == "send email success")

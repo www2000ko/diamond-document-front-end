@@ -23,12 +23,12 @@
         <span slot="title" >回收站</span>
       </el-menu-item>
 
-      <el-submenu index="4">
+      <el-submenu index="4" >
         <template slot="title">
-          <i class="el-icon-s-custom"></i>
-          <span>团队空间</span>
+          <i class="el-icon-s-custom"  @click="myteam()"></i>
+          <span @click="myteam()">团队空间</span>
         </template>
-        <el-menu-item-group>
+        <el-menu-item-group >
           <el-menu-item @click="createteamVisible=true">
             <template slot="title" >
               <i class="el-icon-plus"></i>
@@ -99,7 +99,7 @@
                   <el-col :span="9"><el-button type="text" size="mini" @click="toHistory(item.doc_id)">修改记录</el-button></el-col>
                   <el-col :span="9"><el-button type="text" size="mini" @click="TPVisible=true" :disabled="!(teamid!=0&&pageflag==1)">权限管理</el-button></el-col></el-row>
 
-                  <el-button clas="files" @click="tothisdoc(item.doc_id)" slot="reference" style=" box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);border-radius: 10px"><i style="font-size: 150px;font-weight:lighter;color:gray;" class="el-icon-document"></i><p></p>{{item.title| ellipsis}}</el-button>
+                  <el-button clas="files" @click="tothisdoc(item.doc_id)" slot="reference" style=" box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);border-radius: 10px"><i style="font-size: 150px;font-weight:lighter;color:gray;" class="el-icon-document"></i><p></p>{{item.title}}</el-button>
                   
                 </el-popover>
            </div>
@@ -244,7 +244,7 @@
                   <!-- <el-col :span="9"><el-button type="text" size="mini" @click="toHistory(item.doc_id)">修改记录</el-button></el-col> -->
                   <el-col :span="6"><el-button type="text" size="mini" @click="openremove(item.doc_id)">恢复</el-button></el-col></el-row>
 
-                  <el-button clas="files" @click="bedeleted(item.doc_id)" slot="reference" style=" box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);border-radius: 10px"><i style="font-size: 150px;font-weight:lighter;color:gray;" class="el-icon-document"></i><p></p>{{item.title| ellipsis}}</el-button>
+                  <el-button clas="files" @click="bedeleted(item.doc_id)" slot="reference" style=" box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);border-radius: 10px"><i style="font-size: 150px;font-weight:lighter;color:gray;" class="el-icon-document"></i><p></p>{{item.title}}</el-button>
                   
                 </el-popover>
            </div>
@@ -506,16 +506,6 @@ export default {
       this.getallmessage()
     }
   },
-  filters: {
-    // 当标题字数超出时，超出部分显示’...‘。此处限制超出8位即触发隐藏效果
-    ellipsis (value) {
-        if (!value) return ''
-        if (value.length > 8) {
-            return value.slice(0, 8) + '...'
-        }
-        return value
-    }
-  },
   methods: {
     recycle(docid){
 			this.$confirm('此操作将删除该文档, 是否继续?', '提示', {
@@ -720,12 +710,12 @@ export default {
                           alert(error);
                         });
             }
-              else if(type==2)
+              else if(type==0)
             {
               axios
                         .post("http://175.24.53.216:8080/jointeam", {//127.0.0.1:8080
                         team_id:teamid,
-                        id:userid,
+                        id:that.userid,
                         msg:userid
                         })
                         .then(function(response) {
@@ -1145,8 +1135,7 @@ export default {
     -moz-border-radius: 5px;
     box-shadow: 0 0 0px #909399;
     opacity: 1;
-    width:170px;
-    height:200px;
+    width:20%;
     text-align: center;
   }
   .files-value:hover {

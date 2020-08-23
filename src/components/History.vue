@@ -39,7 +39,6 @@ export default {
     },
     mounted (){
       this.$nextTick(()=>{
-          this.opened()
    })
  },
     name: 'History',

@@ -412,11 +412,14 @@ export default {
           })
           .then(function(response) {
             if (response.data.msg == "change password success") {
-              alert("修改成功！");
+              that.$message({
+                message: '修改成功',
+                type: 'success'
+              });
             }
             else
             {
-              alert("修改失败！");
+              that.$message.error('修改失败');
             }
           })
           .catch(function(error) {
@@ -436,8 +439,11 @@ export default {
             address: that.location
           })
           .then(function(res) {
-            alert("修改成功！");
             that.$store.commit('setToken',res.data.token);
+            that.$message({
+                message: '修改成功',
+                type: 'success'
+              });
           })
           .catch(function(error) {
             alert(error);

@@ -151,7 +151,8 @@ export default {
 	
 		this.writeflag = Number(Encrypt.decrypt(this.$route.query.kind));
 		this.docid = Number(Encrypt.decrypt(this.$route.query.docid));
-		this.sharelink="175.24.53.216/#/viewdoc?kind="+Encrypt.encrypt(0)+"&docid="+this.$route.query.docid;
+		this.sharelink="norgannon.cn/#/viewdoc?kind="+Encrypt.encrypt(0)+"&docid="+this.$route.query.docid;
+		console.log(this.docid)
 		this.email = global.userEmail;
 		this.getdoc();
 		this.check_edit();
@@ -164,7 +165,7 @@ export default {
 		}
 	},
 	beforeRouteLeave (to, from , next) {
-		if(this.selfEdit||this.writeflag==1){
+		if(this.writeflag==1){
 			this.$confirm('确定放弃未保存内容？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
